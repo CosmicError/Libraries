@@ -121,7 +121,7 @@ local worldsUtil = require(game:GetService("ReplicatedStorage").Library.Util.Wor
 local eggsUtil = require(game:GetService("ReplicatedStorage").Library.Util.EggsUtil)
     --[[
         .GetIdByNumber(int: id) -> string: eggID
-        .GetMaximumEggNumber(?) -> ?
+        .GetMaximumEggNumber() -> int: globalMaxEggNumber
         .GetByNumber(?) -> ?
     ]]
 local gamepasses = require(game:GetService("ReplicatedStorage").Library.Client.Gamepasses)
@@ -249,7 +249,7 @@ local bestEggModule
 
 for _, release in next, replicatedStorage.__DIRECTORY.Eggs["Zone Eggs"]["World "..worldsUtil.GetWorldNumber()]:GetChildren() do 
 	for _, module in next, release:GetChildren() do
-		if not module.Name:find(162) then
+		if not module.Name:find(eggCmds.GetHighestEggNumberAvailable()) then
 			continue
 		end
 
