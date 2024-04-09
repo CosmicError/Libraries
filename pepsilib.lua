@@ -603,7 +603,7 @@ local function resolveid(image, flag)
 		return image
 	end
 	
-	if type(image) == "string" and (#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://") then
+	if type(image) == "string" and ((#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://")) then
 		
 		if flag then
 			local thing = library.elements[flag] or library.designerelements[flag]
