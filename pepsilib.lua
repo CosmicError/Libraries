@@ -2610,7 +2610,7 @@ function library:CreateWindow(options, ...)
 
 	-- Placeholder for tracking the last selected tab
 	windowFunctions.LastTab = nil
-	
+	local homepage
 	function windowFunctions:CreateTab(options, ...)
 
 		-- Handle potential misuse and set defaults (giard if)
@@ -2724,7 +2724,6 @@ function library:CreateWindow(options, ...)
 		end
 
 		-- Set homepage function if applicable
-		local homepage
 		if not homepage and newTab.LayoutOrder <= 4 then
 			homepage = goto
 		end
