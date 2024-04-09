@@ -603,15 +603,16 @@ local function resolveid(image, flag)
 		return image
 	end
 	
-	if type(image) == "string" and ((#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://")) then
-		
-		if flag then
-			local thing = library.elements[flag] or library.designerelements[flag]
-			if thing and thing.Set then
-				task.spawn(thing.Set, thing, image)
+	if type(image) == "string" then
+		if (#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://") then
+			if flag then
+				local thing = library.elements[flag] or library.designerelements[flag]
+				if thing and thing.Set then
+					task.spawn(thing.Set, thing, image)
+				end
 			end
+			return image
 		end
-		return image
 	end
 	
 	local orig = image
