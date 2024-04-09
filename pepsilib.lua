@@ -2120,7 +2120,7 @@ do
 			end
 
 			-- Get notification data and set defaults
-			local now = os_clock()
+			local now = os.clock()
 			local duration = NotificationData.Time or 6
 			local text = NotificationData.Text or NotificationData.String or NotificationData.Value or NotificationData.Message or NotificationData.Msg
 			text = text or "No text given" -- Set default text if none provided
@@ -2282,7 +2282,7 @@ do
 				end
 				if (Set or isPaused == Set) then
 				else
-					NotificationObj.Expires = math.max(NotificationObj.Expires, os_clock() + math.clamp(NotificationObj.Duration / 2.5, 1, 3))
+					NotificationObj.Expires = math.max(NotificationObj.Expires, os.clock() + math.clamp(NotificationObj.Duration / 2.5, 1, 3))
 				end
 				NotificationObj.Paused = Set
 				if not NoForce then
@@ -2557,12 +2557,11 @@ function library:CreateWindow(options, ...)
 	-- Handle keybind and hide functionality
 	local IgnoreCoreInputs = nil
 	do
-		local os_clock = os.clock
 		library.signals[1 + #library.signals] = userInputService.InputBegan:Connect(function(keyCode)
 			if IgnoreCoreInputs or userInputService:GetFocusedTextBox() then
 				return
 			elseif keyCode.KeyCode == library.configuration.hideKeybind then
-				if not lasthidebing or ((os_clock() - lasthidebing) > 12) then
+				if not lasthidebing or ((os.clock() - lasthidebing) > 12) then
 					main.Visible = not main.Visible
 				end
 				lasthidebing = nil
@@ -2805,9 +2804,15 @@ function library:CreateWindow(options, ...)
 		}
 		
 		function tabFunctions:CreateSection(options, ...)
+
+			-- Handle default options
 			options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
+
+			-- Extract section name and side (with defaults)
 			local sectionName, holderSide = options.Name or "Unnamed Section", options.Side
 			options.Name = sectionName
+
+			-- Create section UI elements
 			local newSection = Instance_new("Frame")
 			local newSectionBorder = Instance_new("Frame")
 			local insideBorderHider = Instance_new("Frame")
@@ -2816,38 +2821,58 @@ function library:CreateWindow(options, ...)
 			local sectionList = Instance_new("UIListLayout")
 			local sectionPadding = Instance_new("UIPadding")
 			local sectionHeadline = Instance_new("TextLabel")
-			colorpickerconflicts[1 + #colorpickerconflicts] = insideBorderHider
-			colorpickerconflicts[1 + #colorpickerconflicts] = outsideBorderHider
-			colorpickerconflicts[1 + #colorpickerconflicts] = sectionHeadline
+
+			-- Add elements to color conflict list for colorpicker
+			colorpickerconflicts[#colorpickerconflicts + 1] = insideBorderHider
+			colorpickerconflicts[#colorpickerconflicts + 1] = outsideBorderHider
+			colorpickerconflicts[#colorpickerconflicts + 1] = sectionHeadline
+
+			-- Set section name with proper formatting
 			newSection.Name = removeSpaces((sectionName and sectionName:lower() or "???") .. "Section")
+
+			-- Parent the section to the holder based on side (defaulting to left)
 			newSection.Parent = (holderSide and (((holderSide:lower() == "left") and left) or right)) or left
+
+			-- Set section background and border colors with color tracking
 			newSection.BackgroundColor3 = library.colors.sectionBackground
-			colored[1 + #colored] = {newSection, "BackgroundColor3", "sectionBackground"}
+			colored[#colored + 1] = {newSection, "BackgroundColor3", "sectionBackground"}
 			newSection.BorderColor3 = library.colors.outerBorder
-			colored[1 + #colored] = {newSection, "BorderColor3", "outerBorder"}
+			colored[#colored + 1] = {newSection, "BorderColor3", "outerBorder"}
+
+			-- Set section size and initial visibility
 			newSection.Size = UDim2.new(1, -20)
 			newSection.Visible = false
+
+			-- Configure section border frame
 			newSectionBorder.Name = "newSectionBorder"
 			newSectionBorder.Parent = newSection
 			newSectionBorder.BackgroundColor3 = library.colors.sectionBackground
-			colored[1 + #colored] = {newSectionBorder, "BackgroundColor3", "sectionBackground"}
+			colored[#colored + 1] = {newSectionBorder, "BackgroundColor3", "sectionBackground"}
 			newSectionBorder.BorderColor3 = library.colors.innerBorder
-			colored[1 + #colored] = {newSectionBorder, "BorderColor3", "innerBorder"}
+			colored[#colored + 1] = {newSectionBorder, "BorderColor3", "innerBorder"}
 			newSectionBorder.BorderMode = Enum.BorderMode.Inset
 			newSectionBorder.Size = UDim2.fromScale(1, 1)
+
+			-- Configure section holder frame
 			sectionHolder.Name = "sectionHolder"
 			sectionHolder.Parent = newSection
 			sectionHolder.BackgroundColor3 = Color3.new(1, 1, 1)
 			sectionHolder.BackgroundTransparency = 1
 			sectionHolder.Size = UDim2.fromScale(1, 1)
+
+			-- Configure section list layout
 			sectionList.Name = "sectionList"
 			sectionList.Parent = sectionHolder
 			sectionList.HorizontalAlignment = Enum.HorizontalAlignment.Center
 			sectionList.SortOrder = Enum.SortOrder.LayoutOrder
 			sectionList.Padding = UDim:new(1)
+
+			-- Configure section padding
 			sectionPadding.Name = "sectionPadding"
 			sectionPadding.Parent = sectionHolder
 			sectionPadding.PaddingTop = UDim:new(9)
+			
+			-- Configure section headline text label
 			sectionHeadline.Name = "sectionHeadline"
 			sectionHeadline.Parent = newSection
 			sectionHeadline.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2858,9 +2883,10 @@ function library:CreateWindow(options, ...)
 			sectionHeadline.LineHeight = 1.15
 			sectionHeadline.Text = (sectionName and sectionName or "???")
 			sectionHeadline.TextColor3 = library.colors.section
-			colored[1 + #colored] = {sectionHeadline, "TextColor3", "section"}
+			colored[#colored + 1] = {sectionHeadline, "TextColor3", "section"}
 			sectionHeadline.TextSize = 14
 			sectionHeadline.Size = UDim2.fromOffset(textToSize(sectionHeadline).X + 4, 12)
+			
 			insideBorderHider.Name = "insideBorderHider"
 			insideBorderHider.Parent = newSection
 			insideBorderHider.BackgroundColor3 = library.colors.sectionBackground
@@ -2875,6 +2901,7 @@ function library:CreateWindow(options, ...)
 			outsideBorderHider.BorderSizePixel = 0
 			outsideBorderHider.Position = UDim2.fromOffset(15, -1)
 			outsideBorderHider.Size = UDim2.fromOffset(sectionHeadline.AbsoluteSize.X + 3, 1)
+			
 			local sectionFunctions = {
 				Flags = {},
 				Remove = function()
@@ -2884,6 +2911,7 @@ function library:CreateWindow(options, ...)
 					end
 				end
 			}
+			
 			function sectionFunctions:Update(extra)
 				local currentHolder = newSection.Parent
 				if not newSection.Visible then
@@ -2894,6 +2922,7 @@ function library:CreateWindow(options, ...)
 					currentHolder.CanvasSize = UDim2:fromOffset(currentHolder:FindFirstChildOfClass("UIListLayout").AbsoluteContentSize.Y + 22 + (tonumber(extra) or 0))
 				end
 			end
+			
 			function sectionFunctions:UpdateAll(...)
 				for _, obj in next, sectionFunctions.Flags do
 					if obj then
@@ -2907,15 +2936,23 @@ function library:CreateWindow(options, ...)
 				end
 				sectionFunctions:Update(...)
 			end
+			
 			function sectionFunctions:AddToggle(options, ...)
+				-- Resolve options as a table if provided as a string
 				options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
+
+				-- Assert required options
 				local toggleName, alreadyEnabled, callback, flagName = assert(options.Name, "Missing Name for new toggle."), options.Value or options.Enabled, options.Callback, options.Flag or (function()
 					library.unnamedtoggles = 1 + (library.unnamedtoggles or 0)
 					return "Toggle" .. tostring(library.unnamedtoggles)
 				end)()
+
+				-- Warn on reused flag name
 				if elements[flagName] ~= nil then
 					warn(debug.traceback("Warning! Re-used flag '" .. flagName .. "'", 3))
 				end
+
+				-- Create UI elements
 				local newToggle = Instance_new("Frame")
 				local toggle = Instance_new("ImageLabel")
 				local toggleInner = Instance_new("ImageLabel")
@@ -2924,43 +2961,54 @@ function library:CreateWindow(options, ...)
 				local keybindPositioner = Instance_new("Frame")
 				local keybindList = Instance_new("UIListLayout")
 				local keybindButton = Instance_new("TextButton")
+				
+				-- Set initial locked state
 				local lockedup = options.Locked
+				
+				local colored_toggle_BackgroundColor3 = {toggle, "BackgroundColor3", "topGradient"}
+				local colored_toggle_ImageColor3 = {toggle, "ImageColor3", "bottomGradient"}
+				local colored_toggleInner_BackgroundColor3 = {toggleInner, "BackgroundColor3", "topGradient"}
+				local colored_toggleInner_ImageColor3 = {toggleInner, "ImageColor3", "bottomGradient"}
+				local colored_toggleHeadline_TextColor3 = {toggleHeadline, "TextColor3", "elementText", (lockedup and 0.5) or nil}
+
+				-- Set toggle name
 				newToggle.Name = removeSpaces((toggleName and toggleName:lower() or "???") .. "Toggle")
+
+				-- Parent toggle to section holder
 				newToggle.Parent = sectionHolder
+
+				-- Set toggle background and transparency
 				newToggle.BackgroundColor3 = Color3.new(1, 1, 1)
 				newToggle.BackgroundTransparency = 1
 				newToggle.Size = UDim2.new(1, 0, 0, 19)
+
+				-- Set toggle image and properties
 				toggle.Name = "toggle"
 				toggle.Parent = newToggle
 				toggle.Active = true
 				toggle.BackgroundColor3 = library.colors.topGradient
-				local colored_toggle_BackgroundColor3 = {toggle, "BackgroundColor3", "topGradient"}
-				colored[1 + #colored] = colored_toggle_BackgroundColor3
 				toggle.BorderColor3 = library.colors.elementBorder
-				colored[1 + #colored] = {toggle, "BorderColor3", "elementBorder"}
 				toggle.Position = UDim2.fromScale(0.0308237672, 0.165842205)
 				toggle.Selectable = true
 				toggle.Size = UDim2.fromOffset(12, 12)
 				toggle.Image = "rbxassetid://2454009026"
 				toggle.ImageColor3 = library.colors.bottomGradient
-				local colored_toggle_ImageColor3 = {toggle, "ImageColor3", "bottomGradient"}
-				colored[1 + #colored] = colored_toggle_ImageColor3
+
+				-- Set toggle inner image and properties
 				toggleInner.Name = "toggleInner"
 				toggleInner.Parent = toggle
 				toggleInner.Active = true
 				toggleInner.AnchorPoint = Vector2.new(0.5, 0.5)
 				toggleInner.BackgroundColor3 = library.colors.topGradient
-				local colored_toggleInner_BackgroundColor3 = {toggleInner, "BackgroundColor3", "topGradient"}
-				colored[1 + #colored] = colored_toggleInner_BackgroundColor3
 				toggleInner.BorderColor3 = library.colors.elementBorder
-				colored[1 + #colored] = {toggleInner, "BorderColor3", "elementBorder"}
 				toggleInner.Position = UDim2.fromScale(0.5, 0.5)
 				toggleInner.Selectable = true
 				toggleInner.Size = UDim2.new(1, -4, 1, -4)
 				toggleInner.Image = "rbxassetid://2454009026"
 				toggleInner.ImageColor3 = library.colors.bottomGradient
-				local colored_toggleInner_ImageColor3 = {toggleInner, "ImageColor3", "bottomGradient"}
-				colored[1 + #colored] = colored_toggleInner_ImageColor3
+				
+				
+				-- Set toggle button properties
 				toggleButton.Name = "toggleButton"
 				toggleButton.Parent = newToggle
 				toggleButton.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2972,6 +3020,8 @@ function library:CreateWindow(options, ...)
 				toggleButton.TextColor3 = Color3.new()
 				toggleButton.TextSize = 14
 				toggleButton.TextTransparency = 1
+				
+				-- Set toggle headline properties
 				toggleHeadline.Name = "toggleHeadline"
 				toggleHeadline.Parent = newToggle
 				toggleHeadline.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2981,49 +3031,71 @@ function library:CreateWindow(options, ...)
 				toggleHeadline.Font = Enum.Font.Code
 				toggleHeadline.Text = toggleName or "???"
 				toggleHeadline.TextColor3 = library.colors.elementText
-				local colored_toggleHeadline_TextColor3 = {toggleHeadline, "TextColor3", "elementText", (lockedup and 0.5) or nil}
-				colored[1 + #colored] = colored_toggleHeadline_TextColor3
 				toggleHeadline.TextSize = 14
 				toggleHeadline.TextXAlignment = Enum.TextXAlignment.Left
-				local last_v = nil
+				
+				colored[1 + #colored] = colored_toggle_BackgroundColor3
+				colored[1 + #colored] = {toggle, "BorderColor3", "elementBorder"}
+				colored[1 + #colored] = colored_toggle_ImageColor3
+				colored[1 + #colored] = colored_toggleInner_BackgroundColor3
+				colored[1 + #colored] = {toggleInner, "BorderColor3", "elementBorder"}
+				colored[1 + #colored] = colored_toggleInner_ImageColor3
+				colored[1 + #colored] = colored_toggleHeadline_TextColor3
+				
+				-- Function to set the toggle state with additional checks
 				local function Set(t, newStatus)
-					if nil == newStatus and t ~= nil then
+					-- Handle default value and store previous state
+					local prevStatus = library_flags[flagName]
+					if nil == newStatus then
 						newStatus = t
 					end
-					last_v = library_flags[flagName]
+
+					-- Check for a condition function in options
 					if options.Condition ~= nil then
 						if type(options.Condition) == "function" then
-							local v, e = pcall(options.Condition, newStatus, last_v)
-							if e then
-								if not v then
-									warn(debug.traceback(string.format("Error in toggle %s's Condition function: %s", flagName, e), 2))
+							local success, error = pcall(options.Condition, newStatus, prevStatus)
+							if not success then
+								if not success then
+									warn(debug.traceback(string.format("Error in toggle %s's Condition function: %s", flagName, error), 2))
 								end
-							else
-								return last_v
+								return prevStatus -- Return previous state on error
 							end
 						end
 					end
+
+					-- Update flag value and location if valid newStatus
 					if newStatus ~= nil and type(newStatus) == "boolean" then
 						library_flags[flagName] = newStatus
 						if options.Location then
 							options.Location[options.LocationFlag or flagName] = newStatus
 						end
-						if callback and (last_v ~= newStatus or options.AllowDuplicateCalls) then
+
+						-- Update visuals and call callback if state changed or allowed
+						if callback and (prevStatus ~= newStatus or options.AllowDuplicateCalls) then
+							-- Update toggle inner color based on new state
 							colored_toggleInner_BackgroundColor3[3] = (newStatus and "main") or "topGradient"
 							colored_toggleInner_BackgroundColor3[4] = (newStatus and 1.5) or nil
 							colored_toggleInner_ImageColor3[3] = (newStatus and "main") or "bottomGradient"
 							colored_toggleInner_ImageColor3[4] = (newStatus and 2.5) or nil
+
+							-- Animate toggle inner color change
 							tweenService:Create(toggleInner, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
 								BackgroundColor3 = (newStatus and darkenColor(library.colors.main, 1.5)) or library.colors.topGradient,
 								ImageColor3 = (newStatus and darkenColor(library.colors.main, 2.5)) or library.colors.bottomGradient
 							}):Play()
-							task.spawn(callback, newStatus, last_v)
+
+							-- Call callback function asynchronously
+							task.spawn(callback, newStatus, prevStatus)
 						end
 					end
+
 					return newStatus
 				end
+				
+				local last_v = nil
 				options.Keybind = options.Keybind or options.Key or options.KeyBind
 				local haskbflag, kbUpdate, kbData = nil, nil, nil
+				
 				if options.Keybind then
 					local options = options.Keybind
 					local htyp = typeof(options)
@@ -3308,6 +3380,7 @@ function library:CreateWindow(options, ...)
 					kbData = objectdata
 					tabFunctions.Flags[kbflag], sectionFunctions.Flags[kbflag], elements[kbflag] = objectdata, objectdata, objectdata
 				end
+				
 				sectionFunctions:Update()
 				library.signals[1 + #library.signals] = toggleButton.MouseButton1Click:Connect(function()
 					if not library.colorpicker and not submenuOpen and not lockedup then
@@ -8102,9 +8175,8 @@ function library:CreateWindow(options, ...)
 	library.UpdateAll = windowFunctions.UpdateAll
 	if options.Themeable or options.DefaultTheme or options.Theme then
 		spawn(function()
-			local os_clock = os.clock
-			local starttime = os_clock()
-			while os_clock() - starttime < 12 do
+			local starttime = os.clock()
+			while os.clock() - starttime < 12 do
 				if homepage then
 					windowFunctions.GoHome = homepage
 					local x, e = pcall(homepage)
@@ -8146,7 +8218,7 @@ function library:CreateWindow(options, ...)
 					end
 				end)
 			end
-			os_clock, starttime = nil
+			os.clock, starttime = nil
 		end)
 	end
 	return windowFunctions
