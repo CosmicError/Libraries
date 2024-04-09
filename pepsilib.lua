@@ -603,16 +603,14 @@ local function resolveid(image, flag)
 		return image
 	end
 	
-	if type(image) == "string" then
-		if (#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://") then
-			if flag then
-				local thing = library.elements[flag] or library.designerelements[flag]
-				if thing and thing.Set then
-					task.spawn(thing.Set, thing, image)
-				end
+	if type(image) == "string" and ((#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://")) then
+		if flag then
+			local thing = library.elements[flag] or library.designerelements[flag]
+			if thing and thing.Set then
+				task.spawn(thing.Set, thing, image)
 			end
-			return image
 		end
+		return image
 	end
 	
 	local orig = image
@@ -7057,9 +7055,9 @@ function library:CreateWindow(options, ...)
 					hexInputBox.Text = Color3ToHex(newColor)
 					if force then
 						color.BackgroundColor3 = force
-						selectorColor.Position = UDim2.new(force and select(3, Color3:ToHSV(force)))  -- .toHSV
+						selectorColor.Position = UDim2.new(force and select(3, force:ToHSV()))
 					end
-					local pos = 1 - (Color3:ToHSV(newColor)) -- .toHSV
+					local pos = 1 - (newColor:ToHSV()) -- .toHSV
 					local scalex = selectorHue.Position.X.Scale
 					if scalex ~= pos and not (((pos == 0) or (pos == 1)) and ((scalex == 1) or (scalex == 0))) then
 						selectorHue.Position = UDim2.new(pos)
@@ -7138,7 +7136,7 @@ function library:CreateWindow(options, ...)
 				selectorColor.AnchorPoint = Vector2.new(0.5, 0.5)
 				selectorColor.BackgroundColor3 = Color3.fromRGB(144, 144, 144)
 				selectorColor.BorderColor3 = Color3.fromRGB(69, 65, 70)
-				selectorColor.Position = UDim2.new(startingColor and select(3, Color3:ToHSV(startingColor)))
+				selectorColor.Position = UDim2.new(startingColor and select(3, startingColor:ToHSV()))
 				selectorColor.Size = UDim2.fromOffset(4, 4)
 				hue.Name = "hue"
 				hue.Parent = colorPickerHolderInner
@@ -7157,7 +7155,7 @@ function library:CreateWindow(options, ...)
 				selectorHue.BackgroundColor3 = Color3:fromRGB(125, 255)
 				selectorHue.BackgroundTransparency = 0.2
 				selectorHue.BorderColor3 = Color3:fromRGB(84, 91)
-				selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(startingColor)))
+				selectorHue.Position = UDim2.new(1 - (startingColor:ToHSV()))
 				selectorHue.Size = UDim2:new(2, 1)
 				hexInput.Name = "hexInput"
 				hexInput.Parent = colorPickerHolderInner
@@ -7432,12 +7430,12 @@ function library:CreateWindow(options, ...)
 						options.Location[options.LocationFlag or flagName] = clr
 					end
 					color.BackgroundColor3 = clr
-					selectorColor.Position = UDim2.new(clr and select(3, Color3:ToHSV(clr)))
-					selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(clr)))
+					selectorColor.Position = UDim2.new(clr and select(3, clr:ToHSV()))
+					selectorHue.Position = UDim2.new(1 - (clr:ToHSV()))
 					colorPickerInner.BackgroundColor3 = darkenColor(clr, 1.5)
 					colorPickerInner.ImageColor3 = darkenColor(clr, 2.5)
 					hexInputBox.Text = Color3ToHex(clr)
-					colorH, colorS, colorV = Color3:ToHSV(clr)
+					colorH, colorS, colorV = clr:ToHSV()
 					if callback and (last_v ~= clr or options.AllowDuplicateCalls) then
 						task.spawn(callback, clr, last_v)
 					end
@@ -7456,8 +7454,8 @@ function library:CreateWindow(options, ...)
 					colorPickerName, callback = options.Name or colorPickerName, options.Callback
 					local clr = library_flags[flagName]
 					color.BackgroundColor3 = clr
-					selectorColor.Position = UDim2.new(clr and select(3, Color3:ToHSV(clr)))
-					selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(clr)))
+					selectorColor.Position = UDim2.new(clr and select(3, clr:ToHSV()))
+					selectorHue.Position = UDim2.new(1 - (clr:ToHSV()))
 					colorPickerInner.BackgroundColor3 = darkenColor(clr, 1.5)
 					colorPickerInner.ImageColor3 = darkenColor(clr, 2.5)
 					hexInputBox.Text = Color3ToHex(clr)
