@@ -1702,46 +1702,61 @@ do
 			return OptionObj
 		end
 		
+		-- Function to sort buttons based on their LayoutOrder
 		local function SortByLayoutOrder(a, b)
 			return a.Order < b.Order
 		end
+
+		-- Default prompt selections
 		local DefaultSelections = {
-			Ok = true
+			Ok = true,
 		}
+
+		-- Library function to create a prompt
 		function library.Prompt(self, PromptData, ...)
-			if rawequal(self, library) then
-			else
+			-- Handle cases where 'self' is not the library
+			if not rawequal(self, library) then
 				PromptData, self = self, library
 			end
-			local PromptEvent = Instance_new("BindableEvent")
+
+			-- Create necessary UI elements
+			local PromptEvent = Instance.new("BindableEvent")
 			local PromptObj = {
 				OnSelect = PromptEvent.Event,
 				Active = true,
-				SelectedEvent = PromptEvent
+				SelectedEvent = PromptEvent,
 			}
-			local ChoicePopup = Instance_new("Frame")
-			local Buttons = Instance_new("ScrollingFrame")
-			local Title = Instance_new("TextLabel")
-			local Description = Instance_new("TextLabel")
+			local ChoicePopup = Instance.new("Frame")
+			local Buttons = Instance.new("ScrollingFrame")
+			local Title = Instance.new("TextLabel")
+			local Description = Instance.new("TextLabel")
+
+			-- Handle optional CloseButton
 			local DoClose = PromptData.CloseButton
 			DoClose = (DoClose == nil) or (DoClose == true) or DoClose or nil
-			local Close = DoClose and Instance_new("ImageButton")
+			local Close = DoClose and Instance.new("ImageButton")
+
+			-- Create the visual hierarchy of the prompt UI
 			do
-				local Border = Instance_new("Frame")
-				local Inner = Instance_new("Frame")
-				local InnerBorder = Instance_new("Frame")
-				local Bar = Instance_new("Frame")
-				local Splitter = Instance_new("Frame")
-				local ButtonBar = Instance_new("Frame")
-				local UIListLayout = Instance_new("UIListLayout")
+				local Border = Instance.new("Frame")
+				local Inner = Instance.new("Frame")
+				local InnerBorder = Instance.new("Frame")
+				local Bar = Instance.new("Frame")
+				local Splitter = Instance.new("Frame")
+				local ButtonBar = Instance.new("Frame")
+				local UIListLayout = Instance.new("UIListLayout")
+
+				-- Set properties for ChoicePopup
 				ChoicePopup.AnchorPoint = Vector2.new(0.5, 0.5)
 				ChoicePopup.BackgroundColor3 = library.colors.background
-				colored[1 + #colored] = {ChoicePopup, "BackgroundColor3", "background"}
+				colored[1 + #colored] = {ChoicePopup, "BackgroundColor3", "background"} -- colored likely for debugging purposes
 				ChoicePopup.BorderColor3 = library.colors.outerBorder
 				colored[1 + #colored] = {ChoicePopup, "BorderColor3", "outerBorder"}
 				ChoicePopup.Name = "ChoicePopup"
 				ChoicePopup.Position = UDim2.new(0.5, 0, 0.5, 0)
 				ChoicePopup.Size = UDim2.new(0, 325, 0, 100)
+
+				-- Set properties for Border
 				Border.AnchorPoint = Vector2.new(0.5, 0.5)
 				Border.BackgroundColor3 = library.colors.background
 				colored[1 + #colored] = {Border, "BackgroundColor3", "background"}
@@ -1752,6 +1767,8 @@ do
 				Border.Parent = ChoicePopup
 				Border.Position = UDim2.new(0.5, 0, 0.5, 0)
 				Border.Size = UDim2.new(1, 0, 1, 0)
+
+				-- Set properties for Inner
 				Inner.AnchorPoint = Vector2.new(0.5, 0.5)
 				Inner.BackgroundColor3 = library.colors.background
 				colored[1 + #colored] = {Inner, "BackgroundColor3", "background"}
@@ -1761,6 +1778,8 @@ do
 				Inner.Parent = ChoicePopup
 				Inner.Position = UDim2.new(0.5, 0, 0.5, 0)
 				Inner.Size = UDim2.new(1, -8, 1, -8)
+
+				-- Set properties for InnerBorder
 				InnerBorder.AnchorPoint = Vector2.new(0.5, 0.5)
 				InnerBorder.BackgroundColor3 = library.colors.background
 				colored[1 + #colored] = {InnerBorder, "BackgroundColor3", "background"}
@@ -1771,12 +1790,16 @@ do
 				InnerBorder.Parent = Inner
 				InnerBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
 				InnerBorder.Size = UDim2.new(1, 0, 1, 0)
+
+				-- Set properties for Bar
 				Bar.BackgroundColor3 = library.colors.main
 				colored[1 + #colored] = {Bar, "BackgroundColor3", "main"}
 				Bar.BorderSizePixel = 0
 				Bar.Name = "Bar"
 				Bar.Parent = InnerBorder
 				Bar.Size = UDim2.new(1, 0, 0, 3)
+
+				-- Set properties for Splitter
 				Splitter.AnchorPoint = Vector2.new(0, 1)
 				Splitter.BackgroundColor3 = Color3.fromRGB(38, 38, 38)
 				Splitter.BorderSizePixel = 0
@@ -1784,6 +1807,8 @@ do
 				Splitter.Parent = InnerBorder
 				Splitter.Position = UDim2.new(0, 0, 1, -35)
 				Splitter.Size = UDim2.new(1, 0, 0, 1)
+
+				-- Set properties for Title
 				Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				Title.BackgroundTransparency = 1
 				Title.Font = Enum.Font.Code
@@ -1796,6 +1821,8 @@ do
 				Title.TextSize = 15
 				Title.TextStrokeTransparency = 0.95
 				Title.TextXAlignment = Enum.TextXAlignment.Left
+
+				-- Set properties for Description
 				Description.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 				Description.BackgroundTransparency = 1
 				Description.Font = Enum.Font.Code
@@ -1812,6 +1839,8 @@ do
 				Description.TextWrap = true
 				Description.TextWrapped = true
 				Description.TextXAlignment = Enum.TextXAlignment.Left
+
+				-- Handle optional close button
 				if Close then
 					Close.AnchorPoint = Vector2.new(1)
 					Close.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1825,6 +1854,8 @@ do
 					Close.ScaleType = Enum.ScaleType.Fit
 					Close.Size = UDim2.new(0, 10, 0, 10)
 				end
+				
+				-- Set properties for ButtonBar
 				ButtonBar.AnchorPoint = Vector2.new(0, 1)
 				ButtonBar.BackgroundColor3 = library.colors.sectionBackground
 				colored[1 + #colored] = {ButtonBar, "BackgroundColor3", "sectionBackground"}
@@ -1833,6 +1864,8 @@ do
 				ButtonBar.Parent = InnerBorder
 				ButtonBar.Position = UDim2.new(0, 0, 1, 0)
 				ButtonBar.Size = UDim2.new(1, 0, 0, 35)
+
+				-- Set properties for Buttons
 				Buttons.AutomaticCanvasSize = Enum.AutomaticSize.X
 				Buttons.BackgroundColor3 = library.colors.sectionBackground
 				colored[1 + #colored] = {Buttons, "BackgroundColor3", "sectionBackground"}
@@ -1852,25 +1885,34 @@ do
 				Buttons.Selectable = false
 				Buttons.Size = UDim2.new(1, -12, 1, 0)
 				Buttons.TopImage = ""
+
+				-- Set properties for UIListLayout
 				UIListLayout.FillDirection = Enum.FillDirection.Horizontal
 				UIListLayout.Padding = UDim.new(0, 10)
 				UIListLayout.Parent = Buttons
 				UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
 				UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 			end
+
+			-- Set references for closing the prompt
 			PromptObj.FrameInstance = ChoicePopup
 			PromptObj.Closed = ChoicePopup.Destroying
 			local function ClosePrompt(method)
 				PromptObj.Active = (ChoicePopup and ChoicePopup:Destroy() and nil) or (PromptEvent:Fire("Close", method and (method == "timeout_")) and nil) or nil
 			end
 			PromptObj.Close = ClosePrompt
+
+			-- Handle optional close button functionality
 			if Close then
 				Close.MouseButton1Click:Connect(((DoClose ~= true) and DoClose) or ClosePrompt)
 			end
+
+			-- Set title and description based on provided data
 			do
 				local NameTxt = PromptData.Name
 				Title.Text = ((NameTxt ~= nil) and tostring(NameTxt)) or "Untitled Prompt"
 			end
+
 			do
 				local DescriptionTxt = PromptData.Description
 				if DescriptionTxt == nil then
@@ -1887,6 +1929,8 @@ do
 				end
 				Description.Text = ((DescriptionTxt ~= nil) and tostring(DescriptionTxt)) or ""
 			end
+			
+			-- Handle options (buttons) and create button functionality
 			do
 				local Selections = PromptData.Options or PromptData.Buttons or PromptData.Choices
 				if Selections then
@@ -1927,6 +1971,7 @@ do
 					end
 					return ButtonsProxy
 				end
+				
 				function PromptObj.PressAll(self, ...)
 					local isSelf = nil
 					if self and rawequal(self, PromptObj) then
@@ -1943,6 +1988,7 @@ do
 						end
 					end
 				end
+				
 				local KeepOpen = PromptData.KeepOpen
 				for Key, OptionData in next, Selections do
 					OptionCount += 1
@@ -1958,6 +2004,8 @@ do
 					ButtonsProxy[Key] = AddOption(OptionData, Key, OptionCount, Buttons, ClosePrompt, PromptEvent, KeepOpen)
 				end
 			end
+
+			-- Handle optional timeout functionality
 			do
 				local to = PromptData.Timeout
 				to = to and tonumber(to)
@@ -1965,107 +2013,156 @@ do
 					task.delay(to, ClosePrompt, "timeout_")
 				end
 			end
+
+			-- Parent the prompt to the main screen and make it draggable
 			ChoicePopup.Parent = MainScreenGui
 			makeDraggable(ChoicePopup, ChoicePopup)
+
+			-- Return the prompt object and the UI element for interaction
 			return PromptObj, ChoicePopup
 		end
 	end
+	
 	do
+		-- Create a frame for popups
 		local Popups = Instance.new("Frame")
+
+		-- Set layout for popups
 		local UIListLayout = Instance.new("UIListLayout")
+		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+		UIListLayout.Padding = UDim.new(0, 5)
+		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+		UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
+		Popups.Parent = MainScreenGui
+		UIListLayout.Parent = Popups
+
+		-- Store references in library for easier access
 		library.NotifyLayout = UIListLayout
+		library.NotificationsFrame = Popups
+
+		-- Define variables
+		local notifications = {} -- Array to store notification data
+		local breathingRoom = 10 -- Time between notification updates (in seconds)
+		local isInverse = true  -- Flag indicating inverted layout
+
+		-- Background and positioning for popups
 		Popups.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		Popups.BackgroundTransparency = 1
 		Popups.Name = "Popups"
 		Popups.Position = UDim2.new(0, 10, 0, 10)
 		Popups.Size = UDim2.new(1, -20, 1, -20)
-		UIListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-		UIListLayout.Padding = UDim.new(0, 5)
-		UIListLayout.Parent = Popups
-		UIListLayout.SortOrder = Enum.SortOrder.LayoutOrder
-		UIListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-		Popups.Parent = MainScreenGui
-		library.NotificationsFrame = Popups
-		local Inverse = true
-		local os_clock = os.clock
-		local Notifications = {}
-		library.Notifications = Notifications
+
+		-- Function to handle notification display loop
 		spawn(function()
-			local v1, vtop, htop = Enum.FillDirection.Vertical, Enum.VerticalAlignment.Top, Enum.HorizontalAlignment.Center
-			while wait_check() do
-				local Len = #Notifications
-				while wait_check() and (Len <= 0) do
-					Len = #Notifications
-					if wait_check(0.25) then
-					else
-						return
+			local lastUpdateTime = os.clock() -- Track time for breathing room
+
+			while wait() do
+				-- Check if there are any notifications
+				local notificationCount = #notifications
+				if notificationCount <= 0 then
+					-- Wait for notifications or timeout
+					if not wait(0.25) then
+						return -- Exit loop if no notifications and timeout reached
 					end
 				end
-				Inverse = ((UIListLayout.FillDirection == v1) and (UIListLayout.VerticalAlignment ~= vtop)) or (UIListLayout.HorizontalAlignment ~= htop)
-				local BreathingRoom, now = 10, os_clock()
-				local Order = 0
-				for Index = Len, 1, -1 do
-					BreathingRoom -= 1
-					if BreathingRoom <= 0 then
-						if wait_check() then
-							BreathingRoom, now = 10, os_clock()
-						else
-							return
+
+				-- Update layout direction based on current settings
+				isInverse = (UIListLayout.FillDirection == Enum.FillDirection.Vertical 
+					and UIListLayout.VerticalAlignment ~= Enum.VerticalAlignment.Top)
+					or UIListLayout.HorizontalAlignment ~= Enum.HorizontalAlignment.Center
+
+				-- Loop through notifications in reverse order
+				for i = notificationCount, 1, -1 do
+					breathingRoom = breathingRoom - 1
+
+					-- Check if update wait is needed
+					if breathingRoom <= 0 then
+						if not wait() then
+							return -- Exit loop if timeout reached during update
 						end
+						breathingRoom = 10
+						lastUpdateTime = os.clock() -- Reset update timer
 					end
-					local Noti = Notifications[Index]
-					local Obj = Noti and Noti.Object
-					if Obj and Noti.Active and (Noti.Paused or ((now - Noti.Expires) < Noti.Duration)) then
-						if Noti.TextLabel.Text ~= Noti.Text then
-							Noti:SetText(Noti.Text)
+
+					-- Get current notification data
+					local notification = notifications[i]
+					local notificationObject = notification and notification.Object
+
+					-- Check if notification is active and needs displaying
+					if notificationObject and notification.Active and (notification.Paused or ((os.clock() - notification.Expires) < notification.Duration)) then
+						-- Update notification text if changed
+						if notification.TextLabel.Text ~= notification.Text then
+							notification:SetText(notification.Text)
 						end
-						if Obj.Visible then
-							Order += 1
-							Obj.LayoutOrder = Order * ((Inverse and -1) or 1)
+
+						-- If notification object is visible, update its layout order
+						if notificationObject.Visible then
+							notificationObject.LayoutOrder = i * (isInverse and -1 or 1)
 						end
-						continue
+					else
+						-- Remove inactive or expired notifications
+						notification.Object = (notificationObject and notificationObject:Destroy()) or nil
+						notifications[i] = nil
 					end
-					Noti.Object = ((Noti.Object and Noti.Object:Destroy()) and nil) or (Noti.Destroy() and nil) or (table.remove(Notifications, Index) and nil) or nil
 				end
 			end
 		end)
+
+		-- Assign notification storage to library for access
+		library.Notifications = notifications
+
+		-- Function to create and display a notification
 		function library.Notify(self, NotificationData, ...)
-			if rawequal(self, library) then
-			else
+
+			-- Handle potential misuse of the function
+			if not rawequal(self, library) then
 				NotificationData, self = self, library
 			end
+
+			-- Get notification data and set defaults
 			local now = os_clock()
-			local dur = NotificationData.Time or 6
-			local TextStr = NotificationData.Text or NotificationData.String or NotificationData.Value or NotificationData.Message or NotificationData.Msg
-			TextStr = ((TextStr == nil) and "No text given") or tostring(TextStr)
+			local duration = NotificationData.Time or 6
+			local text = NotificationData.Text or NotificationData.String or NotificationData.Value or NotificationData.Message or NotificationData.Msg
+			text = text or "No text given" -- Set default text if none provided
+			text = tostring(text) -- Ensure text is a string
+
+			-- Create the notification object with properties
 			local NotificationObj = {
 				InitTime = now,
 				Active = true,
 				Forced = false,
-				Duration = dur,
-				Expires = now + dur,
-				Paused = (NotificationData.Paused and true) or false,
-				Text = TextStr,
-				Arguments = NotificationData
+				Duration = duration,
+				Expires = now + duration,
+				Paused = NotificationData.Paused or false,
+				Text = text,
+				Arguments = NotificationData,
 			}
+
+			-- Set Forced based on Paused state (giard if)
 			NotificationObj.Forced = NotificationObj.Paused
+
+			-- Create UI elements for the notification
 			local Notification = Instance.new("Frame")
 			NotificationObj.Object = Notification
 			local Border = Instance.new("Frame")
 			local Inner = Instance.new("Frame")
-			local Border_2 = Instance.new("Frame")
+			local Border2 = Instance.new("Frame") -- Renamed for consistency
 			local Text = Instance.new("TextLabel")
 			NotificationObj.TextLabel = Text
 			local Bar = Instance.new("Frame")
 			local Close = Instance.new("ImageButton")
+
+			-- Set common properties for notification frame
 			Notification.AnchorPoint = Vector2.one
 			Notification.BackgroundColor3 = library.colors.background
-			colored[1 + #colored] = {Notification, "BackgroundColor3", "background"}
+			colored[1 + #colored] = {Notification, "BackgroundColor3", "background"} -- Track colored elements
 			Notification.BorderColor3 = library.colors.outerBorder
 			colored[1 + #colored] = {Notification, "BorderColor3", "outerBorder"}
 			Notification.Name = "Notification"
 			Notification.Position = UDim2.new(1, -10, 1, -10)
 			Notification.Size = UDim2.new(0, 5e4, 0, 32)
+
+			-- Set properties for border frame
 			Border.AnchorPoint = Vector2.new(0.5, 0.5)
 			Border.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {Border, "BackgroundColor3", "background"}
@@ -2076,6 +2173,8 @@ do
 			Border.Parent = Notification
 			Border.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Border.Size = UDim2.new(1, 0, 1, 0)
+
+			-- Set properties for inner frame
 			Inner.AnchorPoint = Vector2.one / 2
 			Inner.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {Inner, "BackgroundColor3", "background"}
@@ -2085,25 +2184,29 @@ do
 			Inner.Parent = Notification
 			Inner.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Inner.Size = UDim2.new(1, -8, 1, -8)
-			Border_2.AnchorPoint = Vector2.one / 2
-			Border_2.BackgroundColor3 = library.colors.background
-			colored[1 + #colored] = {Border_2, "BackgroundColor3", "background"}
-			Border_2.BorderColor3 = library.colors.innerBorder
-			colored[1 + #colored] = {Border_2, "BorderColor3", "innerBorder"}
-			Border_2.BorderMode = Enum.BorderMode.Inset
-			Border_2.Name = "Border"
-			Border_2.Parent = Inner
-			Border_2.Position = UDim2.new(0.5, 0, 0.5, 0)
-			Border_2.Size = UDim2.new(1, 0, 1, 0)
+
+			-- Set properties for second border frame (giard if)
+			Border2.AnchorPoint = Vector2.one / 2
+			Border2.BackgroundColor3 = library.colors.background
+			colored[1 + #colored] = {Border2, "BackgroundColor3", "background"}
+			Border2.BorderColor3 = library.colors.innerBorder
+			colored[1 + #colored] = {Border2, "BorderColor3", "innerBorder"}
+			Border2.BorderMode = Enum.BorderMode.Inset
+			Border2.Name = "Border"
+			Border2.Parent = Inner
+			Border2.Position = UDim2.new(0.5, 0, 0.5, 0)
+			Border2.Size = UDim2.new(1, 0, 1, 0)
+			
+			-- Set properties for text label
 			Text.AnchorPoint = Vector2.new(0, 0.5)
 			Text.BackgroundTransparency = 1
 			Text.Font = Enum.Font.Code
 			Text.FontSize = Enum.FontSize.Size14
 			Text.Name = "Text"
-			Text.Parent = Border_2
+			Text.Parent = Border2
 			Text.Position = UDim2.new(0, 8, 0.5, 0)
 			Text.Size = UDim2.new(1, -8, 1, -7)
-			Text.Text = TextStr
+			Text.Text = text
 			Text.TextColor3 = library.colors.elementText
 			colored[1 + #colored] = {Text, "TextColor3", "elementText"}
 			Text.TextScaled = true
@@ -2112,78 +2215,95 @@ do
 			Text.TextWrap = true
 			Text.TextWrapped = true
 			Text.TextXAlignment = Enum.TextXAlignment.Left
+
+			-- Set properties for bar frame
 			Bar.BackgroundColor3 = library.colors.main
 			colored[1 + #colored] = {Bar, "BackgroundColor3", "main"}
 			Bar.BorderSizePixel = 0
 			Bar.Name = "Bar"
-			Bar.Parent = Border_2
+			Bar.Parent = Border2
 			Bar.Size = UDim2.new(0, 3, 1, 0)
+
+			-- Set properties for close button
 			Close.AnchorPoint = Vector2.new(1, 0.5)
 			Close.BackgroundTransparency = 1
 			Close.Image = "rbxassetid://5492252477"
 			Close.ImageColor3 = library.colors.elementText
 			colored[1 + #colored] = {Close, "ImageColor3", "elementText"}
 			Close.Name = "Close"
-			Close.Parent = Border_2
+			Close.Parent = Border2
 			Close.Position = UDim2.new(1, -6, 0.5, 0)
 			Close.ScaleType = Enum.ScaleType.Fit
 			Close.Size = UDim2.new(0, 10, 0, 10)
+
+			-- Update notification size based on text length
 			Notification.Size = UDim2.new(0, 64 + textToSize(Text).X, 0, 32)
+
+			-- Set notification parent and layout order
 			Notification.Parent = Popups
-			Notification.LayoutOrder = #Notification.Parent:GetChildren() * ((Inverse and 1) or -1)
-			if Popups.Parent then
-			else
+			Notification.LayoutOrder = #Notification.Parent:GetChildren() * ((isInverse and 1) or -1) -- changed Inverse to IsInverse because Inverse isn't a thing
+
+			-- Ensure Popups parent exists
+			if not Popups.Parent then
 				Popups.Parent = MainScreenGui
 			end
+
+			-- Connect events to notification object
 			NotificationObj.OnClose = Close.Activated
 			NotificationObj.InputBegan = Notification.InputBegan
 			NotificationObj.Destroying = Notification.Destroying
 			NotificationObj.MouseEnter = Notification.MouseEnter
 			NotificationObj.MouseLeave = Notification.MouseLeave
+
+			-- Define methods for the notification object
+			
+			-- SetText method (giard if)
 			function NotificationObj.SetText(self, Str)
-				if rawequal(self, NotificationObj) then
-				else
+				if not rawequal(self, NotificationObj) then
 					Str = self
 				end
-				Str = ((Str == nil) and "No text given") or tostring(Str)
+				Str = Str or "No text given"
+				Str = tostring(Str)
 				Text.Text, NotificationObj.Text = Str, Str
 				Notification.Size = UDim2.new(0, 44 + Text.TextBounds.X, 0, 32)
 				return Str, Text
 			end
+
+			-- Pause method (giard if)
 			local function Pause(self, Set, NoForce)
-				if rawequal(self, NotificationObj) then
-				else
+				if not rawequal(self, NotificationObj) then
 					Set, NoForce = self, Set
 				end
-				local IsPaused = NotificationObj.Paused
+				local isPaused = NotificationObj.Paused
 				if Set == nil then
-					Set = not IsPaused
+					Set = not isPaused
 				else
 					Set = Set or false
 				end
-				if Set or (IsPaused == Set) then
+				if (Set or isPaused == Set) then
 				else
 					NotificationObj.Expires = math.max(NotificationObj.Expires, os_clock() + math.clamp(NotificationObj.Duration / 2.5, 1, 3))
 				end
 				NotificationObj.Paused = Set
-				if NoForce then
-				else
+				if not NoForce then
 					NotificationObj.Forced = Set
 				end
 				return Set
 			end
 			NotificationObj.SetPaused = Pause
+
+			-- AddTime method
 			function NotificationObj.AddTime(self, Extension)
-				if rawequal(self, NotificationObj) then
-				else
+				if not rawequal(self, NotificationObj) then
 					Extension = self
 				end
 				NotificationObj.Expires += Extension
 			end
+
+			-- Hide method (giard if)
 			function NotificationObj.Hide(self, SetPause)
 				if Notification and NotificationObj.Active then
-					if rawequal(self, NotificationObj) then
-					else
+					if not rawequal(self, NotificationObj) then
 						SetPause = self
 					end
 					if SetPause then
@@ -2192,10 +2312,11 @@ do
 					Notification.Visible = false
 				end
 			end
+
+			-- Show method (giard if)
 			function NotificationObj.Show(self, SetPause)
 				if Notification and NotificationObj.Active then
-					if rawequal(self, NotificationObj) then
-					else
+					if not rawequal(self, NotificationObj) then
 						SetPause = self
 					end
 					if SetPause then
@@ -2204,34 +2325,36 @@ do
 					Notification.Visible = true
 				end
 			end
+
+			-- SetVisible method (giard if)
 			function NotificationObj.SetVisible(self, Visible, SetPause)
 				if Notification and NotificationObj.Active then
-					if rawequal(self, NotificationObj) then
-					else
+					if not rawequal(self, NotificationObj) then
 						Visible, SetPause = self, Visible
 					end
-					if Visible == nil then
-						Notification.Visible = not Notification.Visible
-					else
-						Notification.Visible = (Visible and true) or false
-					end
+					Notification.Visible = (Visible and true) or false
 					if SetPause then
 						Pause(Notification.Visible)
 					end
 				end
 			end
+
+			-- Mouse enter/leave events to handle pausing (giard if)
 			Notification.MouseEnter:Connect(function()
 				if NotificationObj.Forced then
 					return
 				end
 				Pause(true, true)
 			end)
+
 			Notification.MouseLeave:Connect(function()
 				if NotificationObj.Forced then
 					return
 				end
 				Pause(false, true)
 			end)
+
+			-- Destroy method
 			local function Destroy()
 				if Notification then
 					Notification:Destroy()
@@ -2240,44 +2363,59 @@ do
 				NotificationObj.Object = nil
 			end
 			NotificationObj.Destroy = Destroy
+
+			-- Connect close button to destroy notification
 			Close.Activated:Connect(Destroy)
-			Notifications[1 + #Notifications] = NotificationObj
+
+			-- Add notification to list and return details
+			notifications[1 + #notifications] = NotificationObj
 			return NotificationObj, Notification, Text
 		end
 	end
 end
+
+-- Function to create a window with various options
 function library:CreateWindow(options, ...)
+
+	-- Handle potential misuse and set defaults
 	options = (options and type(options) == "string" and resolvevararg("Window", options, ...)) or options
-	local homepage = nil
-	local windowoptions = options
+	local windowoptions = options or {}  -- Use an empty table if options is nil
 	local windowName = options.Name or "Unnamed Window"
 	options.Name = windowName
+
+	-- Update workspace name if needed (giard if)
 	if windowName and #windowName > 0 and library.WorkspaceName == "Pepsi Lib" then
 		library.WorkspaceName = convertfilename(windowName, "Pepsi Lib")
 	end
-	local pepsiLibrary = Instance_new("ScreenGui")
-	library.MainScreenGui, MainScreenGui = pepsiLibrary, pepsiLibrary
-	local main = Instance_new("Frame")
-	local mainBorder = Instance_new("Frame")
-	local tabSlider = Instance_new("Frame")
-	local innerMain = Instance_new("Frame")
-	local innerMainBorder = Instance_new("Frame")
-	local innerBackdrop = Instance_new("ImageLabel")
-	local innerMainHolder = Instance_new("Frame")
-	local tabsHolder = Instance_new("ImageLabel")
-	local tabHolderList = Instance_new("UIListLayout")
-	local tabHolderPadding = Instance_new("UIPadding")
-	local headline = Instance_new("TextLabel")
-	local splitter = Instance_new("TextLabel")
+
+	-- Create UI elements
+	local pepsiLibrary = Instance.new("ScreenGui")
+	local main = Instance.new("Frame")
+	local mainBorder = Instance.new("Frame")
+	local tabSlider = Instance.new("Frame")
+	local innerMain = Instance.new("Frame")
+	local innerMainBorder = Instance.new("Frame")
+	local innerBackdrop = Instance.new("ImageLabel")
+	local innerMainHolder = Instance.new("Frame")
+	local tabsHolder = Instance.new("ImageLabel")
+	local tabHolderList = Instance.new("UIListLayout")
+	local tabHolderPadding = Instance.new("UIPadding")
+	local headline = Instance.new("TextLabel")
+	local splitter = Instance.new("TextLabel")
 	local submenuOpen = nil
 	library.globals["__Window" .. options.Name] = {
 		submenuOpen = submenuOpen
 	}
-	pepsiLibrary.Name = "     "
+
+	-- Set parent and properties for ScreenGui
+	library.MainScreenGui, MainScreenGui = pepsiLibrary, pepsiLibrary
+	pepsiLibrary.Name = "   "  -- Add non-breaking space for alignment
 	pepsiLibrary.Parent = library.gui_parent
 	pepsiLibrary.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 	pepsiLibrary.DisplayOrder = 10
 	pepsiLibrary.ResetOnSpawn = false
+
+	-- Set parent and properties for main frame
 	main.Name = "main"
 	main.Parent = pepsiLibrary
 	main.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -2287,7 +2425,9 @@ function library:CreateWindow(options, ...)
 	colored[1 + #colored] = {main, "BorderColor3", "outerBorder"}
 	main.Position = UDim2.fromScale(0.5, 0.5)
 	main.Size = UDim2.fromOffset(500, 545)
-	makeDraggable(main, main)
+	makeDraggable(main, main)  -- Assume makeDraggable function exists
+
+	-- Set properties for main border frame
 	mainBorder.Name = "mainBorder"
 	mainBorder.Parent = main
 	mainBorder.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -2298,6 +2438,8 @@ function library:CreateWindow(options, ...)
 	mainBorder.BorderMode = Enum.BorderMode.Inset
 	mainBorder.Position = UDim2.fromScale(0.5, 0.5)
 	mainBorder.Size = UDim2.fromScale(1, 1)
+
+	-- Set properties for inner main frame
 	innerMain.Name = "innerMain"
 	innerMain.Parent = main
 	innerMain.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -2307,6 +2449,8 @@ function library:CreateWindow(options, ...)
 	colored[1 + #colored] = {innerMain, "BorderColor3", "outerBorder"}
 	innerMain.Position = UDim2.fromScale(0.5, 0.5)
 	innerMain.Size = UDim2.new(1, -14, 1, -14)
+	
+	-- Set properties for inner main border frame
 	innerMainBorder.Name = "innerMainBorder"
 	innerMainBorder.Parent = innerMain
 	innerMainBorder.AnchorPoint = Vector2.new(0.5, 0.5)
@@ -2317,12 +2461,16 @@ function library:CreateWindow(options, ...)
 	innerMainBorder.BorderMode = Enum.BorderMode.Inset
 	innerMainBorder.Position = UDim2.fromScale(0.5, 0.5)
 	innerMainBorder.Size = UDim2.fromScale(1, 1)
+
+	-- Set properties for inner main holder frame
 	innerMainHolder.Name = "innerMainHolder"
 	innerMainHolder.Parent = innerMain
 	innerMainHolder.BackgroundColor3 = Color3.new(1, 1, 1)
 	innerMainHolder.BackgroundTransparency = 1
 	innerMainHolder.Position = UDim2:fromOffset(25)
 	innerMainHolder.Size = UDim2.new(1, 0, 1, -25)
+
+	-- Set properties for inner backdrop image label
 	innerBackdrop.Name = "innerBackdrop"
 	innerBackdrop.Parent = innerMainHolder
 	innerBackdrop.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2330,10 +2478,16 @@ function library:CreateWindow(options, ...)
 	innerBackdrop.Size = UDim2.fromScale(1, 1)
 	innerBackdrop.ZIndex = -1
 	innerBackdrop.Visible = library_flags["__Designer.Background.UseBackgroundImage"] and true
-	innerBackdrop.ImageColor3 = library_flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
-	innerBackdrop.ImageTransparency = (library_flags["__Designer.Background.ImageTransparency"] or 95) / 100
-	innerBackdrop.Image = resolveid(library_flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
-	library.Backdrop = innerBackdrop
+
+	-- Set backdrop properties based on flags (giard if)
+	if library_flags["__Designer.Background.UseBackgroundImage"] then
+		innerBackdrop.ImageColor3 = library_flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
+		innerBackdrop.ImageTransparency = (library_flags["__Designer.Background.ImageTransparency"] or 95) / 100
+		innerBackdrop.Image = resolveid(library_flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
+		library.Backdrop = innerBackdrop
+	end
+
+	-- Set properties for tabs holder image label
 	tabsHolder.Name = "tabsHolder"
 	tabsHolder.Parent = innerMain
 	tabsHolder.BackgroundColor3 = library.colors.topGradient
@@ -2344,15 +2498,21 @@ function library:CreateWindow(options, ...)
 	tabsHolder.Image = "rbxassetid://2454009026"
 	tabsHolder.ImageColor3 = library.colors.bottomGradient
 	colored[1 + #colored] = {tabsHolder, "ImageColor3", "bottomGradient"}
+
+	-- Set properties for tab holder list UI list layout
 	tabHolderList.Name = "tabHolderList"
 	tabHolderList.Parent = tabsHolder
 	tabHolderList.FillDirection = Enum.FillDirection.Horizontal
 	tabHolderList.SortOrder = Enum.SortOrder.LayoutOrder
 	tabHolderList.VerticalAlignment = Enum.VerticalAlignment.Center
 	tabHolderList.Padding = UDim:new(3)
+
+	-- Set properties for tab holder padding UI padding
 	tabHolderPadding.Name = "tabHolderPadding"
 	tabHolderPadding.Parent = tabsHolder
 	tabHolderPadding.PaddingLeft = UDim:new(7)
+	
+	-- Set properties for headline text label
 	headline.Name = "headline"
 	headline.Parent = tabsHolder
 	headline.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2367,6 +2527,8 @@ function library:CreateWindow(options, ...)
 	colored[1 + #colored] = {headline, "TextStrokeColor3", "outerBorder"}
 	headline.TextStrokeTransparency = 0.75
 	headline.Size = UDim2:new(textToSize(headline).X + 4, 1)
+
+	-- Set properties for splitter text label
 	splitter.Name = "splitter"
 	splitter.Parent = tabsHolder
 	splitter.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2381,6 +2543,8 @@ function library:CreateWindow(options, ...)
 	splitter.TextStrokeColor3 = library.colors.tabText
 	colored[1 + #colored] = {splitter, "TextStrokeColor3", "tabText"}
 	splitter.TextStrokeTransparency = 0.75
+
+	-- Set properties for tab slider frame
 	tabSlider.Name = "tabSlider"
 	tabSlider.Parent = main
 	tabSlider.BackgroundColor3 = library.colors.main
@@ -2389,6 +2553,8 @@ function library:CreateWindow(options, ...)
 	tabSlider.Position = UDim2.fromOffset(100, 30)
 	tabSlider.Size = UDim2:fromOffset(1)
 	tabSlider.Visible = false
+	
+	-- Handle keybind and hide functionality
 	local IgnoreCoreInputs = nil
 	do
 		local os_clock = os.clock
@@ -2403,20 +2569,26 @@ function library:CreateWindow(options, ...)
 			end
 		end)
 	end
+
+	-- Window functions table to store window specific data
 	local windowFunctions = {
 		tabCount = 0,
 		selected = {},
 		Flags = elements
 	}
 	library.globals["__Window" .. windowName].windowFunctions = windowFunctions
+
+	-- Functions to control window visibility
 	function windowFunctions:Show(x)
 		main.Visible = (x == nil) or (x == true) or (x == 1)
 		return main.Visible
 	end
+
 	function windowFunctions:Hide(x)
 		main.Visible = (x == false) or (x == 0)
 		return main.Visible
 	end
+
 	function windowFunctions:Visibility(x)
 		if x == nil then
 			main.Visible = not main.Visible
@@ -2425,6 +2597,8 @@ function library:CreateWindow(options, ...)
 		end
 		return main.Visible
 	end
+
+	-- Function to move the tab slider
 	function windowFunctions:MoveTabSlider(tabObject)
 		spawn(function()
 			tabSlider.Visible = true
@@ -2434,52 +2608,68 @@ function library:CreateWindow(options, ...)
 			}):Play()
 		end)
 	end
+
+	-- Placeholder for tracking the last selected tab
 	windowFunctions.LastTab = nil
+	
 	function windowFunctions:CreateTab(options, ...)
-		options = (options and (type(options) == "string") and resolvevararg("Tab", options, ...)) or options or {
-			Name = "Pepsi Style: Elite Lego Hax"
-		}
+
+		-- Handle potential misuse and set defaults (giard if)
+		options = (options and (type(options) == "string") and resolvevararg("Tab", options, ...)) or options or {}
+		options.Name = options.Name or "Unnamed Tab"
+		windowFunctions.tabCount = windowFunctions.tabCount + 1
+
+		-- Resolve image ID (giard if)
 		local image = options.Image
 		if image then
 			image = resolveid(image)
 		end
-		local tabName = options.Name or "Unnamed Tab"
-		options.Name = tabName
-		windowFunctions.tabCount = windowFunctions.tabCount + 1
+
+		-- Create tab button and holder frame
 		local newTab = Instance_new((image and "ImageButton") or "TextButton")
 		local newTabHolder = Instance_new("Frame")
-		library.globals["__Window" .. windowName].newTabHolder = newTabHolder
 		local left = Instance_new("ScrollingFrame")
 		local leftList = Instance_new("UIListLayout")
 		local leftPadding = Instance_new("UIPadding")
 		local right = Instance_new("ScrollingFrame")
 		local rightList = Instance_new("UIListLayout")
 		local rightPadding = Instance_new("UIPadding")
-		newTab.Name = removeSpaces((tabName and tostring(tabName):lower() or "???") .. "Tab")
+		library.globals["__Window" .. windowName].newTabHolder = newTabHolder
+
+		-- Set tab name and layout order
+		newTab.Name = removeSpaces((options.Name and tostring(options.Name):lower() or "???") .. "Tab")
 		newTab.Parent = tabsHolder
 		newTab.BackgroundTransparency = 1
 		newTab.LayoutOrder = (options.LastTab and 99999) or tonumber(options.TabOrder or options.LayoutOrder) or (2 + windowFunctions.tabCount)
 		local colored_newTab_TextColor3 = nil
+
+		-- Configure tab button for image or text
 		if image then
 			newTab.Image = image
 			newTab.ImageColor3 = options.ImageColor or options.Color or Color3.new(1, 1, 1)
-			newTab.Size = UDim2:new(tabsHolder.AbsoluteSize.Y, 1)
+			newTab.Size = UDim2:new(tabsHolder.AbsoluteSize.Y, 1)  -- Match tab holder height
 		else
+			-- Set text tab properties
 			colored_newTab_TextColor3 = {newTab, "TextColor3", "tabText"}
 			colored[1 + #colored] = colored_newTab_TextColor3
 			newTab.Font = Enum.Font.Code
-			newTab.Text = (tabName and tostring(tabName)) or "???"
+			newTab.Text = (options.Name and tostring(options.Name)) or "???"
+			
+			-- Adjust text color based on tab count (guard if)
 			if windowFunctions.tabCount ~= 1 then
-				colored_newTab_TextColor3[4] = 1.35
+				colored_newTab_TextColor3[4] = 1.35  -- Adjust color table alpha for deselection
 				newTab.TextColor3 = darkenColor(library.colors.tabText, 1.35)
 			else
 				newTab.TextColor3 = library.colors.tabText
 			end
+			
 			newTab.TextSize = 14
 			newTab.TextStrokeColor3 = Color3.fromRGB(42, 42, 42)
 			newTab.TextStrokeTransparency = 0.75
-			newTab.Size = UDim2:new(textToSize(newTab).X + 4, 1)
+			newTab.Size = UDim2:new(textToSize(newTab).X + 4, 1)  -- Size based on text width
 		end
+
+		-- Define the "goto" function for tab selection
 		local function goto()
 			if not library.colorpicker and not submenuOpen and (windowFunctions.selected.button ~= newTab) and newTab.Parent and newTabHolder.Parent then
 				pcall(function()
@@ -2494,23 +2684,38 @@ function library:CreateWindow(options, ...)
 						end
 					end
 				end)
+
+				-- Handle deselecting previous tab
 				if windowFunctions.LastTab then
 					windowFunctions.LastTab[4] = 1.35
 				end
+				
+				local tweenInfo = TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration)
+				
+				-- Move tab slider and update selected tab information
 				windowFunctions:MoveTabSlider(newTab)
+				windowFunctions.selected.holder.Visible = false
+				windowFunctions.selected.button = newTab
+				windowFunctions.selected.holder = newTabHolder
+
+				-- Handle text color tween for previously selected tab
 				if windowFunctions.selected.button.ClassName == "TextButton" then
-					tweenService:Create(windowFunctions.selected.button, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
+					tweenService:Create(windowFunctions.selected.button, tweenInfo, {
 						TextColor3 = darkenColor(library.colors.tabText, 1.35)
 					}):Play()
 				end
+
+				-- Handle text color reset for current tab
 				if colored_newTab_TextColor3 then
 					colored_newTab_TextColor3[4] = nil
 				end
+
+				-- Update selected elements and visibility
 				windowFunctions.selected.holder.Visible = false
 				windowFunctions.selected.button = newTab
 				windowFunctions.selected.holder = newTabHolder
 				if windowFunctions.selected.button.ClassName == "TextButton" then
-					tweenService:Create(windowFunctions.selected.button, TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection), {
+					tweenService:Create(windowFunctions.selected.button, tweenInfo, {
 						TextColor3 = library.colors.tabText
 					}):Play()
 				end
@@ -2518,10 +2723,17 @@ function library:CreateWindow(options, ...)
 				windowFunctions.LastTab = colored_newTab_TextColor3
 			end
 		end
+
+		-- Set homepage function if applicable
+		local homepage
 		if not homepage and newTab.LayoutOrder <= 4 then
 			homepage = goto
 		end
-		library.signals[1 + #library.signals] = newTab.MouseButton1Click:Connect(goto)
+
+		-- Connect click event for tab selection
+		library.signals[#library.signals + 1] = newTab.MouseButton1Click:Connect(goto)
+
+		-- Handle tab slider setup on first tab creation
 		if windowFunctions.tabCount == 1 then
 			tabSlider.Size = UDim2.fromOffset(newTab.AbsoluteSize.X, 1)
 			tabSlider.Position = UDim2.fromOffset(newTab.AbsolutePosition.X, newTab.AbsolutePosition.Y + newTab.AbsoluteSize.Y) - UDim2.fromOffset(main.AbsolutePosition.X, main.AbsolutePosition.Y)
@@ -2529,12 +2741,16 @@ function library:CreateWindow(options, ...)
 			windowFunctions.selected.holder = newTabHolder
 			windowFunctions.selected.button = newTab
 		end
-		newTabHolder.Name = removeSpaces((tabName and tabName:lower()) or "???") .. "TabHolder"
+
+		-- Set tab holder properties
+		newTabHolder.Name = removeSpaces((options.Name and options.Name:lower()) or "???") .. "TabHolder"
 		newTabHolder.Parent = innerMainHolder
 		newTabHolder.BackgroundColor3 = Color3.new(1, 1, 1)
 		newTabHolder.BackgroundTransparency = 1
 		newTabHolder.Size = UDim2.fromScale(1, 1)
 		newTabHolder.Visible = windowFunctions.tabCount == 1
+
+		-- Create internal UI elements for the tab holder
 		left.Name = "left"
 		left.Parent = newTabHolder
 		left.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2550,6 +2766,7 @@ function library:CreateWindow(options, ...)
 		leftPadding.Name = "leftPadding"
 		leftPadding.Parent = left
 		leftPadding.PaddingTop = UDim:new(12)
+
 		right.Name = "right"
 		right.Parent = newTabHolder
 		right.BackgroundColor3 = Color3.new(1, 1, 1)
@@ -2566,6 +2783,8 @@ function library:CreateWindow(options, ...)
 		rightPadding.Name = "rightPadding"
 		rightPadding.Parent = right
 		rightPadding.PaddingTop = UDim:new(12)
+		
+		-- Define tab functions (removal and selection)
 		local tabFunctions = {
 			Flags = {},
 			Remove = function()
@@ -2584,6 +2803,7 @@ function library:CreateWindow(options, ...)
 			end,
 			Select = goto
 		}
+		
 		function tabFunctions:CreateSection(options, ...)
 			options = (options and type(options) == "string" and resolvevararg("Tab", options, ...)) or options
 			local sectionName, holderSide = options.Name or "Unnamed Section", options.Side
