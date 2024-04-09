@@ -932,23 +932,29 @@ local function SeverAllConnections(t, cache)
 	cache = cache or {}
 	for k, v in pairs(t) do
 		t[k] = nil
-		if v ~= nil then
-			if cache[v] then
-				-- Guard clause: if the value is already in the cache, continue to the next iteration
-				continue
-			end
-			local te = typeof(v)
-			if te then
-				if te == "RBXScriptConnection" then
-					v:Disconnect()
-				elseif te == "Instance" then
-					v:Destroy()
-				elseif te == "table" then
-					cache[v] = true
-					-- Recursive call to SeverAllConnections for nested tables
-					SeverAllConnections(v, cache)
-				end
-			end
+		
+		if not v then
+			continue
+		end
+		
+		if cache[v] then
+			-- Guard clause: if the value is already in the cache, continue to the next iteration
+			continue
+		end
+		
+		local te = typeof(v)
+		if not te then
+			continue
+		end
+		
+		if te == "RBXScriptConnection" then
+			v:Disconnect()
+		elseif te == "Instance" then
+			v:Destroy()
+		elseif te == "table" then
+			cache[v] = true
+			-- Recursive call to SeverAllConnections for nested tables
+			SeverAllConnections(v, cache)
 		end
 	end
 end
@@ -968,15 +974,18 @@ local function hardunload(library)
 
 	-- Unload elements except those marked as "Persistence"
 	for cflag, data in pairs(elements) do
-		if data.Type ~= "Persistence" then
-			if data.Set and data.Options.UnloadValue ~= nil then
-				data.Set(data.Options.UnloadValue)
-			end
-			if data.Options.UnloadFunc then
-				local success, error_message = pcall(data.Options.UnloadFunc)
-				if not success and error_message then
-					warn(debug.traceback("Error unloading '" .. tostring(cflag) .. "'\n" .. error_message))
-				end
+		if data.Type == "Persistence" then
+			continue
+		end
+		
+		if data.Set and data.Options.UnloadValue ~= nil then
+			data.Set(data.Options.UnloadValue)
+		end
+		
+		if data.Options.UnloadFunc then
+			local success, error_message = pcall(data.Options.UnloadFunc)
+			if not success and error_message then
+				warn(debug.traceback("Error unloading '" .. tostring(cflag) .. "'\n" .. error_message))
 			end
 		end
 	end
@@ -2101,7 +2110,7 @@ do
 						end
 					else
 						-- Remove inactive or expired notifications
-						notification.Object = (notificationObject and notificationObject:Destroy()) or nil
+						notification.Object = ((notification.Object and notification.Object:Destroy()) and nil) or (notification.Destroy() and nil) or (table.remove(notifications, i) and nil) or nil
 						notifications[i] = nil
 					end
 				end
