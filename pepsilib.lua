@@ -527,6 +527,7 @@ library.Subs = library.subs
 local library_flags = library.flags
 library.Flags = library_flags
 local destroyrainbows, destroyrainbowsg = nil
+
 function darkenColor(clr, intensity)
 	if not intensity or (intensity == 1) then
 		return clr
@@ -535,6 +536,7 @@ function darkenColor(clr, intensity)
 		return Color3.new(clr.R / intensity, clr.G / intensity, clr.B / intensity)
 	end
 end
+
 library.subs.darkenColor = darkenColor
 local __runscript = true
 local function wait_check(...)
@@ -545,6 +547,7 @@ local function wait_check(...)
 		return false
 	end
 end
+
 library.subs.Wait, library.subs.wait, library.Wait = wait_check, wait_check, wait_check
 function library.IsGuiValid()
 	return __runscript
@@ -559,6 +562,7 @@ do
 		return lwr(tostring(b)) > lwr(tostring(a))
 	end
 end
+
 do
 	local varargresolve = {
 		Window = {"Name", "Theme"},
@@ -576,118 +580,131 @@ do
 		Persistence = {"Name", "Value", "Callback", "Flag", "Location", "LocationFlag", "UnloadValue", "UnloadFunc", "Workspace", "Persistive", "Suffix", "LoadCallback", "SaveCallback", "PostLoadCallback", "PostSaveCallback", "ScrollUpButton", "ScrollDownButton", "ScrollButtonRate", "DisablePrecisionScrolling", "AllowDuplicateCalls"},
 		Designer = {"Backdrop", "Image", "Info", "Credit"}
 	}
+	
 	function resolvevararg(objtype, ...)
 		local data = varargresolve[objtype]
 		local t = {}
+		
 		if data then
 			for index, value in next, {...} do
 				t[data[index]] = value
 			end
 		end
+		
 		return t
 	end
 end
+
 local resolvercache = {}
 library.resolvercache = resolvercache
+
 local function resolveid(image, flag)
-	if image then
-		if type(image) == "string" then
-			if (#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://") then
-				if flag then
-					local thing = library.elements[flag] or library.designerelements[flag]
-					if thing and thing.Set then
-						task.spawn(thing.Set, thing, image)
-					end
-				end
-				return image
+	if not image then
+		return image
+	end
+	
+	if type(image) == "string" and (#image > 14 and string.sub(image, 1, 13) == "rbxassetid://") or (#image > 12 and string.sub(image, 1, 11) == "rbxasset://") or (#image > 12 and string.sub(image, 1, 11) ~= "rbxthumb://") then
+		
+		if flag then
+			local thing = library.elements[flag] or library.designerelements[flag]
+			if thing and thing.Set then
+				task.spawn(thing.Set, thing, image)
 			end
 		end
-		local orig = image
-		if resolvercache[orig] then
-			if flag then
-				local thing = library.elements[flag] or library.designerelements[flag]
-				if thing and thing.Set then
-					task.spawn(thing.Set, thing, resolvercache[orig])
-				end
+		return image
+	end
+	
+	local orig = image
+	if resolvercache[orig] then
+		if flag then
+			local thing = library.elements[flag] or library.designerelements[flag]
+			if thing and thing.Set then
+				task.spawn(thing.Set, thing, resolvercache[orig])
 			end
-			return resolvercache[orig]
 		end
-		image = tonumber(image) or image
-		local succezz = pcall(function()
-			local typ = type(image)
-			if typ == "string" then
-				--[[
-				if getsynasset then
-					if #image > 11 and (string.sub(image, 1, 11) == "synasset://") then
-						return getsynasset(string.sub(image, 12))
-					elseif (#image > 14) and (string.sub(image, 1, 14) == "synasseturl://") then
-						local x, e = pcall(function()
-							local codename, fixes = string.gsub(image, ".", function(c)
-								if c:lower() == c:upper() and not tonumber(c) then
-									return ""
-								end
-							end)
-							codename = string.sub(codename, 1, 24) .. tostring(fixes)
-							local fold = isfolder("./Pepsi Lib")
-							if fold then
-							else
-								makefolder("./Pepsi Lib")
+		return resolvercache[orig]
+	end
+	
+	image = tonumber(image) or image
+	local succezz = pcall(function()
+		
+		local typ = type(image)
+		if typ == "string" then
+			--[[
+			if getsynasset then
+				if #image > 11 and (string.sub(image, 1, 11) == "synasset://") then
+					return getsynasset(string.sub(image, 12))
+				elseif (#image > 14) and (string.sub(image, 1, 14) == "synasseturl://") then
+					local x, e = pcall(function()
+						local codename, fixes = string.gsub(image, ".", function(c)
+							if c:lower() == c:upper() and not tonumber(c) then
+								return ""
 							end
-							fold = isfolder("./Pepsi Lib/Themes")
-							if fold then
-							else
-								makefolder("./Pepsi Lib/Themes")
-							end
-							fold = isfolder("./Pepsi Lib/Themes/SynapseAssetsCache")
-							if fold then
-							else
-								makefolder("./Pepsi Lib Themes/SynapseAssetsCache")
-							end
-							if not fold or not isfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat") then
-								local res = game:HttpGet(string.sub(image, 15))
-								if res ~= nil then
-									writefile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat", res)
-								end
-							end
-							return getsynasset(readfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat"))
 						end)
-						if x and e ~= nil then
-							return e
+						codename = string.sub(codename, 1, 24) .. tostring(fixes)
+						local fold = isfolder("./Pepsi Lib")
+						if fold then
+						else
+							makefolder("./Pepsi Lib")
 						end
+						fold = isfolder("./Pepsi Lib/Themes")
+						if fold then
+						else
+							makefolder("./Pepsi Lib/Themes")
+						end
+						fold = isfolder("./Pepsi Lib/Themes/SynapseAssetsCache")
+						if fold then
+						else
+							makefolder("./Pepsi Lib Themes/SynapseAssetsCache")
+						end
+						if not fold or not isfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat") then
+							local res = game:HttpGet(string.sub(image, 15))
+							if res ~= nil then
+								writefile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat", res)
+							end
+						end
+						return getsynasset(readfile("./Pepsi Lib/Themes/SynapseAssetsCache/" .. codename .. ".dat"))
+					end)
+					if x and e ~= nil then
+						return e
 					end
 				end
-				]]
-				if (#image < 11) or ((string.sub(image, 1, 13) ~= "rbxassetid://") and (string.sub(image, 1, 11) ~= "rbxasset://") and string.sub(image, 1, 11) ~= "rbxthumb://") then
-					image = tonumber(image:gsub("%D", ""), 10) or image
-					typ = type(image)
+			end
+			]]
+			if (#image < 11) or ((string.sub(image, 1, 13) ~= "rbxassetid://") and (string.sub(image, 1, 11) ~= "rbxasset://") and string.sub(image, 1, 11) ~= "rbxthumb://") then
+				image = tonumber(image:gsub("%D", ""), 10) or image
+				typ = type(image)
+			end
+		end
+		
+		if (typ == "number") and (image > 0) then
+			pcall(function()
+				local nfo = Marketplace and Marketplace:GetProductInfo(image)
+				image = tostring(image)
+				if nfo and nfo.AssetTypeId == 1 then
+					image = "rbxassetid://" .. image
+				elseif nfo.AssetTypeId == 13 then
+					local decal = game:GetObjects("rbxassetid://" .. image)[1]
+					image = "rbxassetid://" .. ((decal and decal.Texture) or "0"):match("%d+$")
+					decal = (decal and decal:Destroy() and nil) or nil
 				end
-			end
-			if (typ == "number") and (image > 0) then
-				pcall(function()
-					local nfo = Marketplace and Marketplace:GetProductInfo(image)
-					image = tostring(image)
-					if nfo and nfo.AssetTypeId == 1 then
-						image = "rbxassetid://" .. image
-					elseif nfo.AssetTypeId == 13 then
-						local decal = game:GetObjects("rbxassetid://" .. image)[1]
-						image = "rbxassetid://" .. ((decal and decal.Texture) or "0"):match("%d+$")
-						decal = (decal and decal:Destroy() and nil) or nil
-					end
-				end)
-			else
-				image = nil
-			end
-		end)
-		if succezz and image then
-			if orig then
-				resolvercache[orig] = image
-			end
-			resolvercache[image] = image
-			if flag then
-				local thing = library.elements[flag] or library.designerelements[flag]
-				if thing and thing.Set then
-					task.spawn(thing.Set, thing, image)
-				end
+			end)
+		else
+			image = nil
+		end
+	end)
+	if succezz and image then
+		if orig then
+			resolvercache[orig] = image
+		end
+		
+		resolvercache[image] = image
+		
+		if flag then
+			local thing = library.elements[flag] or library.designerelements[flag]
+			
+			if thing and thing.Set then
+				task.spawn(thing.Set, thing, image)
 			end
 		end
 	end
@@ -698,71 +715,10 @@ library.resolvercache = resolvercache
 local colored, colors = library.colored, library.colors
 local tweenService = game:GetService("TweenService")
 local updatecolors, MainScreenGui = nil
+
 do
 	local MayGC = 0
-	spawn(function()
-		local IsDescendantOf = game.IsDescendantOf
-		local RemoveTable = table.remove
-		while wait_check() do
-			while shared.NO_LIB_GC do
-				wait(20)
-				if wait_check() then
-				else
-					return
-				end
-			end
-			wait(10)
-			local Breathe = 30
-			for DataIndex = #colored, 1, -1 do
-				if MayGC > 0 then
-					break
-				end
-				Breathe -= 1
-				if Breathe <= 0 then
-					Breathe = 30
-					if wait_check() then
-						if MayGC > 0 then
-							break
-						end
-					else
-						return
-					end
-				end
-				if MayGC > 0 then
-					break
-				end
-				local data = colored[DataIndex]
-				data = data and data[1]
-				if data and (typeof(data) == "Instance") and IsDescendantOf(data, MainScreenGui) then
-				elseif MayGC <= 0 then
-					RemoveTable(colored, DataIndex)
-				else
-					break
-				end
-			end
-			local sigs = library.signals
-			local len = sigs and #sigs
-			if len then
-				local Dyn = math.round(len / 10)
-				Dyn = ((Dyn < 1) and 1) or Dyn
-				for DataIndex = len, 1, -1 do
-					Breathe -= 1
-					if Breathe <= 0 then
-						Breathe = Dyn
-						if wait_check() then
-						else
-							return
-						end
-					end
-					local data = sigs[DataIndex]
-					if data and (typeof(data) == "RBXScriptConnection") and data.Connected then
-					else
-						RemoveTable(sigs, DataIndex)
-					end
-				end
-			end
-		end
-	end)
+
 	local function colortwee(data, tweenit)
 		local cclr = colors[data[3]]
 		local darkness = data[4]
@@ -770,56 +726,145 @@ do
 			[data[2]] = (darkness and darkness ~= 1 and darkenColor(cclr, darkness)) or cclr
 		}):Play()
 	end
+
 	local function colordarktwee(data)
 		local cclr = colors[data[3]]
 		local darkness = data[4]
 		data[1][data[2]] = (darkness and darkness ~= 1 and darkenColor(cclr, darkness)) or cclr
 	end
+
 	function updatecolors(tweenit)
+		if not library.objects or #library.objects == 0 and not next(library.objects) then
+			MayGC -= 1
+			return
+		end
+
 		MayGC += 1
-		if library.objects and (#library.objects > 0 or next(library.objects)) then
-			for _, data in next, colored do
-				local x, e
-				if tweenit then
-					x, e = pcall(colortwee, data, tweenit)
+
+		for _, data in ipairs(colored) do
+			local success, error_message
+			if tweenit then
+				success, error_message = pcall(colortwee, data, tweenit)
+				if not success then
+					break
 				end
-				if x then
-				else
-					local x, e = pcall(colordarktwee, data)
-					if e and not x then
-						warn(debug.traceback(e))
-					end
+			else
+				success, error_message = pcall(colordarktwee, data)
+				if not success and error_message then
+					warn(debug.traceback(error_message))
 				end
 			end
-			pcall(function()
-				if library.Backdrop then
-					library.Backdrop.Visible = library_flags["__Designer.Background.UseBackgroundImage"] and true
-					library.Backdrop.Image = resolveid(library_flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
-					library.Backdrop.ImageColor3 = library_flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
-					library.Backdrop.ImageTransparency = (library_flags["__Designer.Background.ImageTransparency"] or 95) / 100
-				end
-			end)
 		end
+
+		pcall(function()
+			if library.Backdrop then
+				library.Backdrop.Visible = library_flags["__Designer.Background.UseBackgroundImage"] and true
+				library.Backdrop.Image = resolveid(library_flags["__Designer.Background.ImageAssetID"], "__Designer.Background.ImageAssetID") or ""
+				library.Backdrop.ImageColor3 = library_flags["__Designer.Background.ImageColor"] or Color3.new(1, 1, 1)
+				library.Backdrop.ImageTransparency = (library_flags["__Designer.Background.ImageTransparency"] or 95) / 100
+			end
+		end)
+
 		MayGC -= 1
 	end
+
+	task.spawn(function()
+		local IsDescendantOf = game.IsDescendantOf
+		local RemoveTable = table.remove
+
+		while wait_check() do
+			while task.wait(20) and shared.NO_LIB_GC do
+				if not wait_check() then
+					return
+				end
+			end
+
+			task.wait(10)
+			local Breathe = 30
+
+			for DataIndex = #colored, 1, -1 do
+				if MayGC > 0 then
+					break
+				end
+
+				Breathe -= 1
+				if Breathe <= 0 then
+					Breathe = 30
+					if not wait_check() or MayGC > 0 then
+						return
+					end
+				end
+
+				if MayGC > 0 then
+					break
+				end
+
+				local data = colored[DataIndex]
+				data = data and data[1]
+
+				if not data or typeof(data) ~= "Instance" or not IsDescendantOf(data, MainScreenGui) then
+					RemoveTable(colored, DataIndex)
+				else
+					break
+				end
+			end
+
+			local sigs = library.signals
+			local len = sigs and #sigs
+			if not len then
+				return
+			end
+
+			local Dyn = math.round(len / 10)
+			Dyn = (Dyn < 1) and 1 or Dyn
+
+			for DataIndex = len, 1, -1 do
+				Breathe -= 1
+				if Breathe <= 0 then
+					Breathe = Dyn
+					if not wait_check() then
+						return
+					end
+				end
+
+				local data = sigs[DataIndex]
+				if not data or typeof(data) ~= "RBXScriptConnection" or not data.Connected then
+					RemoveTable(sigs, DataIndex)
+				end
+			end
+		end
+	end)
 end
+
+
 local function updatecolorsnotween()
 	updatecolors()
 end
+
+-- Assigning updatecolors function to library.subs.updatecolors
 library.subs.updatecolors = updatecolors
+
+-- Setting up metatable for library.colors
 library.colors = setmetatable({}, {
 	__index = colors,
 	__newindex = function(_, k, v)
+		-- Only update if the value is different from the existing one
 		if colors[k] ~= v then
 			colors[k] = v
+			-- Spawn updatecolorsnotween function
 			spawn(updatecolorsnotween)
 		end
 	end
 })
+
+-- Initialize elements and shared.libraries
 local elements = library.elements
 shared.libraries = shared.libraries or {}
+
 local colorpickerconflicts = library.colorpickerconflicts
+-- KeyHandler setup
 local keyHandler = {
+	-- Define not allowed keys and mouse inputs
 	notAllowedKeys = {
 		[Enum.KeyCode.Return] = true,
 		[Enum.KeyCode.Space] = true,
@@ -834,6 +879,7 @@ local keyHandler = {
 		[Enum.UserInputType.MouseButton2] = true,
 		[Enum.UserInputType.MouseButton3] = true
 	},
+	-- Define allowed keys
 	allowedKeys = {
 		[Enum.KeyCode.LeftShift] = "LShift",
 		[Enum.KeyCode.RightShift] = "RShift",
@@ -881,16 +927,18 @@ local keyHandler = {
 		[Enum.KeyCode.Backquote] = "`"
 	}
 }
-local SeverAllConnections = nil
-function SeverAllConnections(t, cache)
+
+-- Function to sever all connections in a given table
+local function SeverAllConnections(t, cache)
 	cache = cache or {}
-	for k, v in next, t do
+	for k, v in pairs(t) do
 		t[k] = nil
 		if v ~= nil then
 			if cache[v] then
+				-- Guard clause: if the value is already in the cache, continue to the next iteration
 				continue
 			end
-			local te = v and typeof(v)
+			local te = typeof(v)
 			if te then
 				if te == "RBXScriptConnection" then
 					v:Disconnect()
@@ -898,41 +946,55 @@ function SeverAllConnections(t, cache)
 					v:Destroy()
 				elseif te == "table" then
 					cache[v] = true
+					-- Recursive call to SeverAllConnections for nested tables
 					SeverAllConnections(v, cache)
 				end
 			end
 		end
 	end
 end
+
+-- Assign SeverAllConnections function to library.Subs.SeverAllConnections
 library.Subs.SeverAllConnections = SeverAllConnections
+
+-- Function to unload the library and clean up resources
 local function hardunload(library)
-	if library.UnloadCallback and (type(library.UnloadCallback) == "function") then
-		local x, e = pcall(library.UnloadCallback)
-		if not x and e then
-			task.spawn(error, e, 2)
+	-- Call UnloadCallback function if it exists
+	if library.UnloadCallback and type(library.UnloadCallback) == "function" then
+		local success, error_message = pcall(library.UnloadCallback)
+		if not success and error_message then
+			task.spawn(error, error_message, 2)
 		end
 	end
-	for cflag, data in next, elements do
+
+	-- Unload elements except those marked as "Persistence"
+	for cflag, data in pairs(elements) do
 		if data.Type ~= "Persistence" then
 			if data.Set and data.Options.UnloadValue ~= nil then
 				data.Set(data.Options.UnloadValue)
 			end
 			if data.Options.UnloadFunc then
-				local y, u = pcall(data.Options.UnloadFunc)
-				if not y and u then
-					warn(debug.traceback("Error unloading '" .. tostring(cflag) .. "'\n" .. u))
+				local success, error_message = pcall(data.Options.UnloadFunc)
+				if not success and error_message then
+					warn(debug.traceback("Error unloading '" .. tostring(cflag) .. "'\n" .. error_message))
 				end
 			end
 		end
 	end
+
+	-- Clear connections and objects using SeverAllConnections function
 	local hardcache = {}
 	SeverAllConnections(library.signals, hardcache)
 	SeverAllConnections(library.objects, hardcache)
-	hardcache = (table.clear(hardcache) and nil) or nil
+	hardcache = nil
 	library.signals = nil
 	library.objects = nil
 end
+
+-- Assign hardunload function to library.Subs.UnloadArg
 library.Subs.UnloadArg = hardunload
+
+-- Function to unload all libraries
 local function unloadall()
 	if shared.libraries then
 		local b = 50
@@ -943,213 +1005,285 @@ local function unloadall()
 				wait(warn("Looped 50 times while unloading....?"))
 			end
 			local v = shared.libraries[1]
-			if v and v.unload and (type(v.unload) == "function") then
+			if v and v.unload and type(v.unload) == "function" then
 				if not pcall(v.unload) then
 					pcall(hardunload, v)
-					for k in next, v do
+					for k in pairs(v) do
 						v[k] = nil
 					end
 				end
-				if shared.libraries then
-					pcall(function()
-						table.remove(shared.libraries, 1)
-					end)
-				else
-					return pcall(hardunload, library)
-				end
+				table.remove(shared.libraries, 1)
 			end
 		end
 	end
 	shared.libraries = nil
 end
+
+-- Assign unloadall function to shared.unloadall and library.unloadall
 shared.unloadall = unloadall
 library.unloadall = unloadall
-shared.libraries[1 + #shared.libraries] = library
+
+-- Add the current library to shared.libraries
+shared.libraries[#shared.libraries + 1] = library
+
+-- Function to unload the current library
 function library.unload()
 	__runscript = nil
 	hardunload(library)
-	if shared.libraries then
-		for k, v in next, shared.libraries or {} do
-			if v == library then
-				for k in next, table.remove(shared.libraries or {}, k) do
-					v[k] = nil
-				end
-				break
-			end
+	for k, v in pairs(shared.libraries or {}) do
+		if v == library then
+			table.remove(shared.libraries or {}, k)
+			break
 		end
-		if shared.libraries and (#shared.libraries == 0) then
-			shared.libraries = nil
-		end
+	end
+	if shared.libraries and #shared.libraries == 0 then
+		shared.libraries = nil
 	end
 	warn("Unloaded")
 end
+
+-- Alias unload function
 library.Unload = library.unload
-local Instance_new = function(...)
-	local x = {Instance.new(...)}
-	if x[1] then
-		library.objects[1 + #library.objects] = x[1]
+
+-- Custom Instance.new function
+local function Instance_new(...)
+	local instance = {Instance.new(...)}
+	if instance[1] then
+		library.objects[#library.objects + 1] = instance[1]
 	end
-	return unpack(x)
+	return unpack(instance)
 end
 library.subs.Instance_new = Instance_new
-local playersservice = game:GetService("Players")
-local function getresolver(listt, filter, method, _)
-	local huo, args = type(filter), {}
-	local hou = typeof(listt)
-	return ((hou == "function") and function(...)
-		return listt(...)
-	end) or ((hou == "table") and function()
-		return listt
-	end) or function()
-		local hardtype = nil
-		local g = listt
+
+-- Get resolver function
+local playersService = game:GetService("Players")
+
+local function getresolver(list, filter, method)
+	local filterType = type(filter)
+	local listType = typeof(list)
+
+	if listType == "function" then
+		return function(...)
+			return list(...)
+		end
+		
+	elseif listType == "table" then
+		return function()
+			return list
+		end
+		
+	else
+		local getType = typeof(list)
+		local getList = list
+
 		for _ = 1, 5 do
-			hardtype = typeof(g)
-			if hardtype == "function" then
-				local x, e = pcall(listt)
-				if x and e then
-					g = e
+			getType = typeof(getList)
+			
+			if getType == "Instance" then
+				if not method and list == playersService then
+					getList = list:GetPlayers()
 				end
-				hardtype = typeof(g)
-			end
-			if hardtype == "Instance" then
-				local lastg = g
-				if method == nil and listt == playersservice then
-					g = listt:GetPlayers()
-				end
+				
 				if method then
-					local metype = type(method)
-					if metype == "table" then
+					local methodType = type(method)
+					local args
+					
+					if methodType == "table" then
 						method = method.Method or method[1]
 						args = method.Args or method.Arguments or unpack(method, (method.Method ~= nil and 1) or 2)
-						metype = type(method)
+						methodType = type(method)
 					end
-					local y, u = nil, nil
-					if metype == "function" then
-						y, u = pcall(method, listt, unpack(args))
-					elseif metype == "string" then
-						local y, u = pcall(function()
-							return listt[method](listt, unpack(args))
-						end)
-					else
-						warn("Idk how to handle method type of", metype, debug.traceback(""))
-					end
-					if u then
-						if y then
-							g = u
+					
+					if methodType == "function" then
+						local success, result = pcall(method, list, unpack(args))
+						if success then
+							getList = result
 						else
-							warn("Error trying method", method, "on", listt, debug.traceback(u))
+							warn("Error executing method", method, "on", list, debug.traceback(result))
 						end
+						
+					elseif methodType == "string" then
+						local success, result = pcall(function()
+							return list[method](list, unpack(args))
+						end)
+						
+						if success then
+							getList = result
+						else
+							warn("Error executing method", method, "on", list, debug.traceback(result))
+						end
+						
+					else
+						warn("Unknown method type:", methodType, debug.traceback(""))
+						
 					end
 				end
-				if g == lastg then
-					g = listt:GetChildren()
+				
+				if getList == list then
+					getList = list:GetChildren()
 				end
+				
+			elseif getType == "Enum" then
+				getList = list:GetEnumItems()
 			end
-			if hardtype == "Enum" then
-				g = listt:GetEnumItems()
-			end
-			hardtype = typeof(g)
-			if hardtype == "table" then
+			
+			getType = typeof(getList)
+			if getType == "table" then
 				break
 			end
 		end
-		hardtype = typeof(g)
-		if hardtype ~= "table" then
-			warn("Could not resolve " .. hou .. " type to a list.")
+
+		if getType ~= "table" then
+			warn("Could not resolve " .. listType .. " type to a list.")
 			return {}
 		end
+
 		if filter then
-			if huo == "function" then
-				local accept = {}
-				for _, v in next, g do
-					local x, e = pcall(filter, v)
-					if x and e then
-						accept[1 + #accept] = (e == true and v) or e
+			if filterType == "function" then
+				local filtered = {}
+				for _, item in ipairs(getList) do
+					local success, result = pcall(filter, item)
+					
+					if not success or not result then
+						continue
 					end
+					
+					filtered[#filtered + 1] = (result == true and item) or result
 				end
-				g = accept
-			elseif huo == "string" then
-				local accept = {}
-				for _, v in next, g do
-					if tostring(v):lower():find(huo) then
-						accept[1 + #accept] = v
+				
+				getList = filtered
+				
+			elseif filterType == "string" then
+				local filtered = {}
+				for _, item in ipairs(getList) do
+					if not tostring(item):lower():find(filter) then
+						continue
 					end
+					
+					filtered[#filtered + 1] = item
 				end
-				g = accept
-			elseif huo == "table" then
-				local accept = {}
+				
+				getList = filtered
+				
+			elseif filterType == "table" then
+				local filtered = {}
 				if type(filter[1]) == "string" then
-					for _, v in next, g do
-						if tostring(v):lower():find(huo) then
-							accept[1 + #accept] = v
-						elseif filter[0] then
-							accept[1 + #accept] = v
+					for _, item in ipairs(getList) do
+						if not tostring(item):lower():find(filter) and not filter[0] then
+							continue
 						end
+						
+						filtered[#filtered + 1] = item
 					end
 				else
-					for _, v in next, g do
-						if not table.find(filter, v) and not table.find(filter, tostring(v)) then
-							accept[1 + #accept] = v
+					for _, item in ipairs(getList) do
+						if not table.find(filter, item) and not table.find(filter, tostring(item)) then
+							filtered[#filtered + 1] = item
 						elseif not filter[0] then
-							accept[1 + #accept] = v
+							filtered[#filtered + 1] = item
 						end
 					end
 				end
-				g = accept
+				getList = filtered
 			end
 		end
-		return g
+
+		return getList
 	end
 end
+
+-- Assign getresolver function to library.subs.GetResolver
 library.subs.GetResolver = getresolver
+
+-- Reset all elements to their defaults
 local function resetall()
 	destroyrainbowsg = true
 	pcall(function()
 		for k, v in next, elements do
-			if v and k and v.Set and (v.Default ~= nil) and (library_flags[k] ~= v.Default) and (string.sub(k, 1, 11) ~= "__Designer.") then
-				v:Set(v.Default)
+			-- Guard statement for v and k existence
+			if v and k then
+				-- Guard statement for Set function and Default value
+				if v.Set and (v.Default ~= nil) then
+					-- Check if library flag doesn't match default and not designer property
+					if (library_flags[k] ~= v.Default) and (string.sub(k, 1, 11) ~= "__Designer.") then
+						v:Set(v.Default)
+					end
+				end
 			end
 		end
 	end)
 end
+
+-- Assign resetall function to library.ResetAll
 library.ResetAll = resetall
+
+-- Get core Roblox services
 local textService = game:GetService("TextService")
 local userInputService = game:GetService("UserInputService")
 local runService = game:GetService("RunService")
-local LP = playersservice.LocalPlayer
-library.LP = LP
-library.Players = playersservice
+
+-- Assign services to library
+library.LP = playersService.LocalPlayer
+library.Players = playersService
 library.UserInputService = userInputService
 library.RunService = runService
-local mouse = LP and LP:GetMouse()
+
+-- Get mouse object (handle studio mode)
+local mouse = library.LP and library.LP:GetMouse()
 if not mouse and PluginManager and runService:IsStudio() then
+	-- Create studio test plugin if needed
 	shared.library_plugin = shared.library_plugin or print("Creating Studio Test-Plugin...") or PluginManager():CreatePlugin()
 	mouse = shared.library_plugin:GetMouse()
 	library.plugin = shared.library_plugin
 end
+
+-- Assign mouse object to library
 library.Mouse = mouse
+
+-- Function to calculate text size (lazy initialization)
 local textToSize = nil
 do
 	local textService = game:GetService("TextService")
 	local bigv2 = Vector2.one * math.huge
+
 	function textToSize(object)
-		return textService:GetTextSize(object.Text, object.TextSize, object.Font, bigv2)
+		-- Guard statement for object existence
+		if object then
+			return textService:GetTextSize(object.Text, object.TextSize, object.Font, bigv2)
+		end
 	end
 end
+
+-- Assign textToSize function to library.subs
 library.subs.textToSize = textToSize
+
+-- Function to remove spaces from a string
 local function removeSpaces(str)
+	-- Guard statement for string existence
 	if str then
 		local newStr = str:gsub(" ", "")
 		return newStr
 	end
 end
+
+-- Assign removeSpaces function to library.subs
 library.subs.removeSpaces = removeSpaces
+
+-- Function to convert hex string to Color3 object
 local function Color3FromHex(hex)
+	-- Remove leading characters and convert to uppercase
 	hex = hex:gsub("#", ""):upper():gsub("0X", "")
-	return Color3.fromRGB(tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
+
+	-- Guard statement for hex string length
+	if #hex == 6 then
+		return Color3.fromRGB(tonumber(hex:sub(1, 2), 16), tonumber(hex:sub(3, 4), 16), tonumber(hex:sub(5, 6), 16))
+	end
 end
+
+-- Assign Color3FromHex function to library.subs
 library.subs.Color3FromHex = Color3FromHex
+
+-- Function to convert Color3 object to hex string (fallback)
 local floor = math.floor
 local function Color3ToHex(color)
 	local r, g, b = string.format("%X", floor(color.R * 255)), string.format("%X", floor(color.G * 255)), string.format("%X", floor(color.B * 255))
@@ -1164,39 +1298,63 @@ local function Color3ToHex(color)
 	end
 	return string.format("%s%s%s", r, g, b)
 end
+
 if Color3.ToHex and not shared.overridecolortohex then
 	local x, e = pcall(Color3.ToHex, Color3.new())
 	if x and type(e) == "string" and #e == 6 then
 		Color3ToHex = Color3.ToHex
 	end
 end
+
+-- Assign Color3ToHex function to library.subs
 library.subs.Color3ToHex = Color3ToHex
+
 local isDraggingSomething = false
+
+-- Function to make an object draggable
 local function makeDraggable(topBarObject, object)
+	-- Local variables for tracking drag state
 	local dragging = nil
 	local dragInput = nil
 	local dragStart = nil
 	local startPosition = nil
+
+	-- Connect to topBarObject.InputBegan for drag initiation
 	library.signals[1 + #library.signals] = topBarObject.InputBegan:Connect(function(input)
+		-- Check for left mouse button or touch input
 		if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
 			dragging = true
 			dragStart = input.Position
 			startPosition = object.Position
+
+			-- Connect to input.Changed for drag end detection
 			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
+				if input.UserInputState ~= Enum.UserInputState.End then
+					return
 				end
+				
+				dragging = false
 			end)
 		end
 	end)
+
+	-- Connect to topBarObject.InputChanged for drag tracking
 	library.signals[1 + #library.signals] = topBarObject.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
-			dragInput = input
+		-- Check for mouse movement or touch input during drag
+		if input.UserInputType ~= Enum.UserInputType.MouseMovement and input.UserInputType ~= Enum.UserInputType.Touch then
+			return
 		end
+		
+		dragInput = input
 	end)
+
+	-- Connect to userInputService.InputChanged for object movement
 	library.signals[1 + #library.signals] = userInputService.InputChanged:Connect(function(input)
+		-- Check if this input is the current drag input
 		if input == dragInput and dragging then
 			local delta = input.Position - dragStart
+
+			-- Handle smooth dragging based on configuration
 			if not isDraggingSomething and library.configuration.smoothDragging then
 				tweenService:Create(object, TweenInfo.new(0.25, library.configuration.easingStyle, library.configuration.easingDirection), {
 					Position = UDim2.new(startPosition.X.Scale, startPosition.X.Offset + delta.X, startPosition.Y.Scale, startPosition.Y.Offset + delta.Y)
@@ -1207,7 +1365,11 @@ local function makeDraggable(topBarObject, object)
 		end
 	end)
 end
+
+-- Assign makeDraggable function to library.subs
 library.subs.makeDraggable = makeDraggable
+
+-- Lazy initialization for JSON functions
 local JSONEncode, JSONDecode = nil, nil
 do
 	local temp_http = game:FindService("HttpService") or game:GetService("HttpService")
@@ -1215,45 +1377,80 @@ do
 	if cloneref and (type(cloneref) == "function") then
 		httpservice, temp_http = cloneref(httpservice), nil
 	end
+
+	-- Assign HttpService to library
 	library.Http = httpservice
+
+	-- Wrap JSONEncode function with pcall for error handling
 	local JSONEncodeFunc = httpservice.JSONEncode
 	function JSONEncode(...)
 		return pcall(JSONEncodeFunc, httpservice, ...)
 	end
 	library.JSONEncode = JSONEncode
+
+	-- Wrap JSONDecode function with pcall for error handling
 	local JSONDecodeFunc = httpservice.JSONDecode
 	function JSONDecode(...)
 		return pcall(JSONDecodeFunc, httpservice, ...)
 	end
 	library.JSONDecode = JSONDecode
 end
+
 local convertfilename
 do
 	local string_gsub = string.gsub
+
+	-- Function to convert a string to a valid filename
 	function convertfilename(str, default, replace)
+		-- Set default replacement character (optional)
 		replace = replace or "_"
+
+		-- Count invalid characters encountered
 		local corrections = 0
+
+		-- Use string.gsub to iterate over each character
 		local predname = string_gsub(str, "%W", function(c)
 			local byt = c:byte()
-			if ((byt == 0) or (byt == 32) or (byt == 33) or (byt == 59) or (byt == 61) or ((byt >= 35) and (byt <= 41)) or ((byt >= 43) and (byt <= 57)) or ((byt >= 64) and (byt <= 123)) or ((byt >= 125) and (byt <= 127))) then
+
+			-- Check for allowed characters (alphanumeric, some symbols)
+			if ((byt >= 0 and byt <= 32) or byt == 33 or byt == 59 or byt == 61 or 
+				(byt >= 35 and byt <= 41) or (byt >= 43 and byt <= 57) or 
+				(byt >= 64 and byt <= 123) or (byt >= 125 and byt <= 127)) then
+				-- Character is allowed, return it directly
+				return c
 			else
-				corrections = 1 + corrections
+				-- Invalid character, increment corrections and return replacement
+				corrections = corrections + 1
 				return replace
 			end
 		end)
-		return (default and corrections == #predname and tostring(default)) or predname
+
+		-- Handle default filename if all characters were invalid
+		if default and corrections == #predname then
+			return tostring(default)
+		end
+
+		-- Return the sanitized filename
+		return predname
 	end
+
+	-- Assign convertfilename function to library.subs
 	library.subs.ConvertFilename = convertfilename
 end
+
 do
 	do
+		-- Function to create a new option element
 		local function NewOption(TextStr, Order, Parent)
-			local Option = Instance_new("Frame")
-			local BBorder = Instance_new("Frame")
-			local Inner_2 = Instance_new("Frame")
-			local Border_2 = Instance_new("Frame")
-			local Text = Instance_new("TextLabel")
-			local Button = Instance_new("TextButton")
+			-- Create UI elements
+			local Option = Instance.new("Frame")
+			local BBorder = Instance.new("Frame")
+			local Inner_2 = Instance.new("Frame")
+			local Border_2 = Instance.new("Frame")
+			local Text = Instance.new("TextLabel")
+			local Button = Instance.new("TextButton")
+
+			-- Set common properties for Option
 			Option.AnchorPoint = Vector2.new(0, 0.5)
 			Option.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {Option, "BackgroundColor3", "background"}
@@ -1262,6 +1459,8 @@ do
 			Option.Name = "Option"
 			Option.Position = UDim2.new(0, 5, 0.5, 0)
 			Option.Size = UDim2.new(0, 35, 0, 25)
+
+			-- Set properties for BBorder
 			BBorder.AnchorPoint = Vector2.new(0.5, 0.5)
 			BBorder.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {BBorder, "BackgroundColor3", "background"}
@@ -1271,6 +1470,8 @@ do
 			BBorder.Parent = Option
 			BBorder.Position = UDim2.new(0.5, 0, 0.5, 0)
 			BBorder.Size = UDim2.new(1, 0, 1, 0)
+
+			-- Set properties for Inner_2
 			Inner_2.AnchorPoint = Vector2.new(0.5, 0.5)
 			Inner_2.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {Inner_2, "BackgroundColor3", "background"}
@@ -1279,6 +1480,8 @@ do
 			Inner_2.Parent = Option
 			Inner_2.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Inner_2.Size = UDim2.new(1, -6, 1, -6)
+
+			-- Set properties for Border_2
 			Border_2.AnchorPoint = Vector2.new(0.5, 0.5)
 			Border_2.BackgroundColor3 = library.colors.background
 			colored[1 + #colored] = {Border_2, "BackgroundColor3", "background"}
@@ -1288,6 +1491,8 @@ do
 			Border_2.Parent = Inner_2
 			Border_2.Position = UDim2.new(0.5, 0, 0.5, 0)
 			Border_2.Size = UDim2.new(1, 0, 1, 0)
+
+			-- Set properties for Text
 			Text.AnchorPoint = Vector2.new(0.5, 0.5)
 			Text.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Text.BackgroundTransparency = 1
@@ -1301,6 +1506,8 @@ do
 			colored[1 + #colored] = {Text, "TextColor3", "elementText"}
 			Text.TextSize = 14
 			Text.TextStrokeTransparency = 0.75
+
+			-- Set properties for Button
 			Button.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 			Button.BackgroundTransparency = 1
 			Button.BorderSizePixel = 0
@@ -1313,23 +1520,43 @@ do
 			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
 			Button.TextSize = 14
 			Button.TextTransparency = 1
+
+			-- Set Text content and adjust Option size
 			Text.Text = TextStr
 			local siz = textToSize(Text)
 			Option.Size = UDim2.new(0, math.max(siz.X, 28) + 12, 0, 25)
+
+			-- Add Option to Parent
 			Option.Parent = Parent
+
+			-- Return Option, Button, and Text objects
 			return Option, Button, Text
 		end
+		
+		-- Function to add an option to a prompt
 		local function AddOption(OptionData, Key, OptionCount, Parent, Close, PromptEvent, KeepOpen)
+
+			-- Determine Enabled state
 			local Enabled = OptionData.Enabled
 			if OptionData.Disabled then
 				Enabled = false
 			else
 				Enabled = Enabled or (Enabled == nil)
 			end
+
+			-- Extract Option Text
 			local OptionText = OptionData.Text or OptionData.String or OptionData.Message or OptionData.Value or OptionData.Name or Key
+
+			-- Extract Callback function
 			local Callback = OptionData.Callback or OptionData.OnPressed or OptionData.Function or nil
+
+			-- Extract Order (layout position)
 			local Order = tonumber(OptionData.Slot or OptionData.Order or OptionData.LayoutOrder or OptionData.Index or OptionCount)
+
+			-- Create Option elements
 			local OptionIns, OptionButton, OptionTxt = NewOption(tostring(OptionText), Order, Parent)
+
+			-- Create Option object
 			local OptionObj = {
 				Text = OptionText,
 				Callback = Callback,
@@ -1341,44 +1568,54 @@ do
 				Order = Order,
 				Enabled = Enabled
 			}
+
+			-- Function to remove the option
 			function OptionObj.Remove()
-				do
-					local Btn = OptionObj.ButtonObject
-					if Btn then
-						Btn:Destroy()
-					end
+				if OptionObj.ButtonObject then
+					OptionObj.ButtonObject:Destroy()
 				end
-				for k in next, OptionObj do
+				for k, _ in next, OptionObj do
 					rawset(OptionObj, k, nil)
 				end
 				return true
 			end
+
+			-- Local variable for Clicked function
 			local Proxy = nil
+
+			-- Function to handle option click
 			local function Clicked(f)
 				return function(...)
 					if f then
 						task.spawn(f, ...)
 					end
 					PromptEvent:Fire(Key, OptionButton.Text, ...)
-					if KeepOpen then
-					else
+					if not KeepOpen then
 						Close()
 					end
 				end
 			end
+
+			-- Function to press the option
 			function OptionObj.Press(...)
 				OptionObj.Update()
 				Proxy = Proxy or Clicked(Callback)
 				Proxy(...)
 			end
+
+			-- Function to lock the option
 			function OptionObj.Lock()
 				OptionObj.Enabled = false
 				OptionObj.Update()
 			end
+
+			-- Function to unlock the option
 			function OptionObj.Unlock()
 				OptionObj.Enabled = true
 				OptionObj.Update()
 			end
+
+			-- Function to set locked state (can be a boolean or function)
 			function OptionObj.SetLocked(self, state)
 				if type(self) == "boolean" then
 					state = self
@@ -1386,6 +1623,8 @@ do
 				OptionObj.Enabled = state
 				OptionObj.Update()
 			end
+
+			-- Function to set a condition function for the option
 			function OptionObj.SetCondition(self, Condition)
 				if type(self) ~= "table" then
 					Condition = self
@@ -1393,14 +1632,26 @@ do
 				OptionObj.Condition = Condition
 				OptionObj.Update()
 			end
+			
 			function OptionObj.Update()
-				do
-					local OptionText = OptionObj.Text or OptionData.Text or OptionData.String or OptionData.Message or OptionData.Value or OptionData.Name or OptionButton.Text or Key
-					OptionButton.Text = tostring(OptionText)
-				end
+				-- Update Option Text based on available modes (original logic preserved)
+				local OptionText = OptionObj.Text or OptionData.Text or OptionData.String or OptionData.Message or OptionData.Value or OptionData.Name or OptionButton.Text or Key
+				OptionButton.Text = tostring(OptionText)
+
+				-- Update Option Layout Order
 				OptionIns.LayoutOrder = tonumber(OptionObj.Order or OptionData.Slot or OptionData.Order or OptionData.LayoutOrder or OptionData.Index or OptionIns.LayoutOrder or OptionCount)
+
+				-- Update Enabled State and Button Connections
 				do
+					-- Determine Enabled state based on original logic and considering Disabled flag
 					local Enabled = OptionData.Enabled
+					if OptionData.Disabled then
+						Enabled = false
+					else
+						Enabled = (Enabled and true) or (Enabled == nil)
+					end
+
+					-- Check if a condition function exists (original logic preserved)
 					local Cond = OptionObj.Condition
 					if Cond then
 						local x, e = pcall(Cond, OptionObj)
@@ -1409,44 +1660,49 @@ do
 						else
 							warn(debug.traceback(string.format("Error in prompt-option %s's Condition function: %s", OptionButton.Text, e), 2))
 						end
-					else
-						if OptionData.Disabled then
-							Enabled = false
-						else
-							Enabled = (Enabled and true) or (Enabled == nil)
-						end
 					end
+
+					-- Update Proxy function based on Callback changes
 					local Proxy = nil
 					do
 						local nCallback = (Enabled and (OptionData.Callback or OptionData.OnPressed or OptionData.Function)) or nil
 						if not Proxy or Callback ~= nCallback then
 							Callback = nCallback
 							Proxy = Clicked(Callback)
+							-- Disconnect previous connection and connect new one if needed
 							OptionObj.PressedConnection = (OptionObj.PressedConnection and OptionObj.PressedConnection:Disconnect() and nil) or (Callback and OptionObj.Pressed:Connect(Proxy)) or nil
 						end
+
+						-- Manage Pressed connection based on Enabled state
 						local PC = OptionObj.PressedConnection
 						if Enabled then
 							if PC then
 								if Callback then
+									-- Keep connection if enabled and callback exists
 								else
+									-- Disconnect if enabled but no callback (original logic preserved)
 									OptionObj.PressedConnection = (PC:Disconnect() and nil) or nil
 								end
 							elseif Callback then
+								-- Connect if enabled and callback exists
 								Proxy = Proxy or Clicked(Callback)
 								OptionObj.PressedConnection = OptionObj.Pressed:Connect(Proxy)
 							end
 						elseif PC then
+							-- Disconnect if disabled
 							OptionObj.PressedConnection = (PC:Disconnect() and nil) or nil
 						end
 					end
+
 					OptionObj.Enabled = Enabled
 					OptionTxt.TextTransparency = (Enabled and 0) or 0.5
 				end
-				return OptionObj
 			end
+				
 			OptionObj.Update()
 			return OptionObj
 		end
+		
 		local function SortByLayoutOrder(a, b)
 			return a.Order < b.Order
 		end
@@ -5499,18 +5755,25 @@ function library:CreateWindow(options, ...)
 									local upkey = options.ScrollUpButton or library.scrollupbutton or shared.scrollupbutton or Enum.KeyCode.Up
 									local downkey = options.ScrollDownButton or library.scrolldownbutton or shared.scrolldownbutton or Enum.KeyCode.Down
 									precisionscrolling = (precisionscrolling and precisionscrolling:Disconnect() and nil) or userInputService.InputBegan:Connect(function(input)
-										if input.UserInputType == Enum.UserInputType.Keyboard then
-											local code = input.KeyCode
-											local isup = code == upkey
-											local isdown = code == downkey
-											if isup or isdown then
-												local txt = userInputService:GetFocusedTextBox()
-												if not txt then
-													while wait_check() and userInputService:IsKeyDown(code) do
-														realDropdownHolder.CanvasPosition = Vector2:new(math.clamp(realDropdownHolder.CanvasPosition.Y + ((isup and -5) or 5), 0, realDropdownHolder.AbsoluteCanvasSize.Y))
-													end
-												end
-											end
+										if input.UserInputType ~= Enum.UserInputType.Keyboard then
+											return
+										end
+										
+										local code = input.KeyCode
+										local isup = code == upkey
+										local isdown = code == downkey
+										if not isup and not isdown then
+											return
+										end
+										
+										local txt = userInputService:GetFocusedTextBox()
+										
+										if txt then
+											return
+										end
+										
+										while wait_check() and userInputService:IsKeyDown(code) do
+											realDropdownHolder.CanvasPosition = Vector2:new(math.clamp(realDropdownHolder.CanvasPosition.Y + ((isup and -5) or 5), 0, realDropdownHolder.AbsoluteCanvasSize.Y))
 										end
 									end)
 									library.signals[1 + #library.signals] = precisionscrolling
@@ -5535,7 +5798,7 @@ function library:CreateWindow(options, ...)
 							showing = dropdownEnabled
 							if showing or dropdownEnabled then
 							else
-								delay(0.01, update)
+								task.delay(0.01, update)
 							end
 						end
 					end
