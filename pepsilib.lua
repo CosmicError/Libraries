@@ -2957,7 +2957,7 @@ function library:CreateWindow(options, ...)
 						end
 						last_v = library_flags[flagName]
 						if (condition ~= false) and (condition ~= 0) then
-							local overridecondition = condition and (type(condition) == "function") and condition
+							local overridecondition = condition and (type(condition) == "function")
 							if overridecondition or (options.Condition ~= nil) then
 								if type(overridecondition or options.Condition) == "function" then
 									local v, e = pcall(overridecondition or options.Condition, newStatus, last_v)
@@ -6798,9 +6798,9 @@ function library:CreateWindow(options, ...)
 					hexInputBox.Text = Color3ToHex(newColor)
 					if force then
 						color.BackgroundColor3 = force
-						selectorColor.Position = UDim2.new(force and select(3, Color3.toHSV(force)))
+						selectorColor.Position = UDim2.new(force and select(3, Color3:ToHSV(force)))  -- .toHSV
 					end
-					local pos = 1 - (Color3.toHSV(newColor))
+					local pos = 1 - (Color3:ToHSV(newColor)) -- .toHSV
 					local scalex = selectorHue.Position.X.Scale
 					if scalex ~= pos and not (((pos == 0) or (pos == 1)) and ((scalex == 1) or (scalex == 0))) then
 						selectorHue.Position = UDim2.new(pos)
@@ -6879,7 +6879,7 @@ function library:CreateWindow(options, ...)
 				selectorColor.AnchorPoint = Vector2.new(0.5, 0.5)
 				selectorColor.BackgroundColor3 = Color3.fromRGB(144, 144, 144)
 				selectorColor.BorderColor3 = Color3.fromRGB(69, 65, 70)
-				selectorColor.Position = UDim2.new(startingColor and select(3, Color3.toHSV(startingColor)))
+				selectorColor.Position = UDim2.new(startingColor and select(3, Color3:ToHSV(startingColor)))
 				selectorColor.Size = UDim2.fromOffset(4, 4)
 				hue.Name = "hue"
 				hue.Parent = colorPickerHolderInner
@@ -6898,7 +6898,7 @@ function library:CreateWindow(options, ...)
 				selectorHue.BackgroundColor3 = Color3:fromRGB(125, 255)
 				selectorHue.BackgroundTransparency = 0.2
 				selectorHue.BorderColor3 = Color3:fromRGB(84, 91)
-				selectorHue.Position = UDim2.new(1 - (Color3.toHSV(startingColor)))
+				selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(startingColor)))
 				selectorHue.Size = UDim2:new(2, 1)
 				hexInput.Name = "hexInput"
 				hexInput.Parent = colorPickerHolderInner
@@ -7173,12 +7173,12 @@ function library:CreateWindow(options, ...)
 						options.Location[options.LocationFlag or flagName] = clr
 					end
 					color.BackgroundColor3 = clr
-					selectorColor.Position = UDim2.new(clr and select(3, Color3.toHSV(clr)))
-					selectorHue.Position = UDim2.new(1 - (Color3.toHSV(clr)))
+					selectorColor.Position = UDim2.new(clr and select(3, Color3:ToHSV(clr)))
+					selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(clr)))
 					colorPickerInner.BackgroundColor3 = darkenColor(clr, 1.5)
 					colorPickerInner.ImageColor3 = darkenColor(clr, 2.5)
 					hexInputBox.Text = Color3ToHex(clr)
-					colorH, colorS, colorV = Color3.toHSV(clr)
+					colorH, colorS, colorV = Color3:ToHSV(clr)
 					if callback and (last_v ~= clr or options.AllowDuplicateCalls) then
 						task.spawn(callback, clr, last_v)
 					end
@@ -7197,8 +7197,8 @@ function library:CreateWindow(options, ...)
 					colorPickerName, callback = options.Name or colorPickerName, options.Callback
 					local clr = library_flags[flagName]
 					color.BackgroundColor3 = clr
-					selectorColor.Position = UDim2.new(clr and select(3, Color3.toHSV(clr)))
-					selectorHue.Position = UDim2.new(1 - (Color3.toHSV(clr)))
+					selectorColor.Position = UDim2.new(clr and select(3, Color3:ToHSV(clr)))
+					selectorHue.Position = UDim2.new(1 - (Color3:ToHSV(clr)))
 					colorPickerInner.BackgroundColor3 = darkenColor(clr, 1.5)
 					colorPickerInner.ImageColor3 = darkenColor(clr, 2.5)
 					hexInputBox.Text = Color3ToHex(clr)
