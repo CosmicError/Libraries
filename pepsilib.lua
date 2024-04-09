@@ -616,6 +616,7 @@ local function resolveid(image, flag)
 		local succezz = pcall(function()
 			local typ = type(image)
 			if typ == "string" then
+				--[[
 				if getsynasset then
 					if #image > 11 and (string.sub(image, 1, 11) == "synasset://") then
 						return getsynasset(string.sub(image, 12))
@@ -655,6 +656,7 @@ local function resolveid(image, flag)
 						end
 					end
 				end
+				]]
 				if (#image < 11) or ((string.sub(image, 1, 13) ~= "rbxassetid://") and (string.sub(image, 1, 11) ~= "rbxasset://") and string.sub(image, 1, 11) ~= "rbxthumb://") then
 					image = tonumber(image:gsub("%D", ""), 10) or image
 					typ = type(image)
@@ -982,14 +984,7 @@ function library.unload()
 	warn("Unloaded")
 end
 library.Unload = library.unload
-local Instance_new = (syn and syn.protect_gui and function(...)
-	local x = {Instance.new(...)}
-	if x[1] then
-		library.objects[1 + #library.objects] = x[1]
-		pcall(syn.protect_gui, x[1])
-	end
-	return unpack(x)
-end) or function(...)
+local Instance_new = function(...)
 	local x = {Instance.new(...)}
 	if x[1] then
 		library.objects[1 + #library.objects] = x[1]
