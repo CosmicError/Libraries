@@ -2690,7 +2690,7 @@ function library:CreateWindow(options, ...)
 					windowFunctions.LastTab[4] = 1.35
 				end
 				
-				local tweenInfo = TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration)
+				local tweenInfo = TweenInfo.new(0.35, library.configuration.easingStyle, library.configuration.easingDirection)
 				
 				-- Move tab slider and update selected tab information
 				windowFunctions:MoveTabSlider(newTab)
